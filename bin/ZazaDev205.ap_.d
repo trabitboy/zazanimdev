@@ -1,0 +1,25 @@
+C:\Users\thomas\andro\ws\zazadev205\bin\ZazaDev205.ap_ \
+ : C:\Users\thomas\andro\ws\zazadev205\res\drawable-hdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\res\drawable-mdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\res\drawable-xhdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\res\drawable-xxhdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\res\layout\main.xml \
+C:\Users\thomas\andro\ws\zazadev205\res\values\strings.xml \
+C:\Users\thomas\andro\ws\zazadev205\bin\res\drawable-hdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\bin\res\drawable-mdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\bin\res\drawable-xhdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\bin\res\drawable-xxhdpi\ic_launcher.png \
+C:\Users\thomas\andro\ws\zazadev205\assets\bg32.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\brush32.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\buttons.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\current.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\frame0.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\icon.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\iconalpha.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\next.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\palette.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\previous.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\sample.bmp \
+C:\Users\thomas\andro\ws\zazadev205\assets\slash.wav \
+C:\Users\thomas\andro\ws\zazadev205\assets\template.bmp \
+C:\Users\thomas\andro\ws\zazadev205\bin\AndroidManifest.xml \

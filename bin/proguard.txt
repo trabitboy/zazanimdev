@@ -1,0 +1,3 @@
+# view AndroidManifest.xml #generated:27
+-keep class zaza.dev205.Zazadev205Activity { <init>(...); }
+
