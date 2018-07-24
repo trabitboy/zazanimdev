@@ -3,12 +3,22 @@
 // unify paint to always paint on pane
 //always render pane but in good place
 // always paint to pane
-// try alpha mode like clear color white TODO 
 // each commit to a separate buffer (undo buffer)
 // TODO reset undo on scroll ( flick and button )
 // TODO proper undo button
 // TODO save surfs as in clear color to debug
 // BUG systematically clears frame on third undo
+
+// try alpha mode like clear color white TODO 
+// existing situation
+// 		windows dx9 > transparent pixels of pane
+//						stay transp, but alpha pix are alphaed against black, not white
+//						even if I touch the rendered individual pixels of pane to add alpha on border,
+//						blending will still be wrong
+//						alternatives:
+//							stop render api and use only gl, write fragment shader
+//							(slow) create a boolean map of the borders of the painted pane,
+//									and do the alpha on cpu side (poc needed)
 
 //WIP clean input was preventing paint
 // suppress clean in put and clean manually event depending on case
@@ -1360,17 +1370,20 @@ void saveFrame(char * path, int idx){
 	);
 
 	void copyTextureToBufferSurf(SDL_Texture * tex){
-			#ifndef __ANDROID_API__
-			texToBufferSurfUsingFB(
-			tex
-			);
-			#endif
+		
+		//DBG testing to see if whole prg works with gl on win32
+		
+			// #ifndef __ANDROID_API__
+			// texToBufferSurfUsingFB(
+			// tex
+			// );
+			// #endif
 			
-			#ifdef __ANDROID_API__
+			// #ifdef __ANDROID_API__
 			texToBufferSurfUsingRT(
 			tex
 			);
-			#endif
+			// #endif
 	
 	}
 
@@ -1675,10 +1688,10 @@ void init_play();
 		
 		
 		//WINDOWS DEBUG
-		LOGD("ctex debug.bmp SAVE");
-		SDL_SaveBMP(
-				bufferSurf
-				,"debug.bmp");
+		// LOGD("ctex debug.bmp SAVE");
+		// SDL_SaveBMP(
+				// bufferSurf
+				// ,"debug.bmp");
 		
 		//at this point all white is 255 on windows (patch to copytex buffer surf, and debug save is ok)
 		
@@ -2562,6 +2575,8 @@ void init_play();
 				
 				//WORKAROUND it seems there are clear color pixels with full alpha
 				//we run it as a workaround
+				
+				//DBG WIN GL MIG
 				clearCurrentOfClearColorFullAlphaPixels();
 				 
 
@@ -3489,12 +3504,9 @@ void initTimeCodeMode(){
 
 							if(pol->endofpress && painting){
 							  painting=false;
-							  if(activeBrush==roundEraser){
-								 LOGD("zzn clearing white from round eraser \n ");
-								 clearCurrentOfClearColorFullAlphaPixels();
-							  }
 							  
-							  if(BEHIND){
+							  
+  							  if(BEHIND){
 								  //we need to merge behind with current canvas when painting brush up
 								  //lets blit current on behind and make it current
 								  //TODO
@@ -3507,6 +3519,26 @@ void initTimeCodeMode(){
 								  commitAbove();
 								  
 							  }
+
+							  
+							  if(activeBrush==roundEraser){
+								 LOGD("zzn clearing white from round eraser \n ");
+								 clearCurrentOfClearColorFullAlphaPixels();
+							  }
+							  
+							  // if(BEHIND){
+								  // //we need to merge behind with current canvas when painting brush up
+								  // //lets blit current on behind and make it current
+								  // //TODO
+								  // commitBehind();
+								  
+								  // //then reinit behind (clean or reallocation)
+								  // // initBehind();
+							  // }else{
+								  
+								  // commitAbove();
+								  
+							  // }
 							}
 
 	}
@@ -3929,7 +3961,7 @@ bool checkButtonColl(int x,int y){
 				//false
 				);
 				
-				kshortcuts(&polled);
+				// kshortcuts(&polled);
 				
 				if(dodonpaint){
 					dodonpachiDraw(&polled);
@@ -4919,6 +4951,11 @@ void saveTranspCol(){
 		Uint16 reqscrw=0;
 		Uint16 reqscrh=0;
 		//this is how we detect windows
+
+		#ifdef __ANDROID_API__
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengles2");
+		#endif
+		
 		#ifndef __ANDROID_API__
 		reqscrw=
 		// SCRWDTH
@@ -4930,7 +4967,7 @@ void saveTranspCol(){
 		// SCRHGTH
 		//480
 		;
-
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
 		#endif
 		
 		SDL_CreateWindowAndRenderer(

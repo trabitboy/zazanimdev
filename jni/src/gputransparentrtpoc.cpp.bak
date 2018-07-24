@@ -1,11 +1,147 @@
-//2 fingers zoom / zoom
-// -- first keyboard events
+//WIP 
+// behind renamed to pane
+// unify paint to always paint on pane
+//always render pane but in good place
+// always paint to pane
+// each commit to a separate buffer (undo buffer)
+// TODO reset undo on scroll ( flick and button )
+// TODO proper undo button
+// TODO save surfs as in clear color to debug
+// BUG systematically clears frame on third undo
 
-//palette screen loading bmp from ressource
+// try alpha mode like clear color white TODO 
+// existing situation
+// 		windows dx9 > transparent pixels of pane
+//						stay transp, but alpha pix are alphaed against black, not white
+//						even if I touch the rendered individual pixels of pane to add alpha on border,
+//						blending will still be wrong
+//						alternatives:
+//							stop render api and use only gl, write fragment shader
+//							(slow) create a boolean map of the borders of the painted pane,
+//									and do the alpha on cpu side (poc needed)
+
+//WIP clean input was preventing paint
+// suppress clean in put and clean manually event depending on case
+
+//TODO reintegrate java stub with history handling  ( twice event freq )
+
+
+//WIP bug on eraser fill/ fill empty color/kill color > just on android note 8> note 4 is fine
+// fill of empty color is fine, check erase in fill / kill color before work? 
+
+//only on note 8 , seems on select colors single "dither" pixels are added as if 16bit 
+
+
+// add 0 frames support on timecodes ( to skip work frames on playback export)
+//with decoration
+
+// WIP simple tool to remove all occurences of one color in pic 
+// (to remove sketches in clearer color )
+//new mode for pick mode
+//WIP code ready, put in UI
+
+
+//paste under in "paste bit",
+// in conjunction with behind flag ?
+
+//paste under in paste postion
+
+ 
+//background > load list of images named bgXXX.bmp
+//each image is displayed until new bg
+//drawing on bg is the pb
+
+// simple but useful -> paint below, useful for coloring and fill
+// -do switch to paint below
+// - on switch create/clear tex
+// -if paint below, flag to paint on this tex
+// - flag to render also this tex if paint below
+// - when to commit / reset surf to normal render tex ? probably on pen up
+// DONE tested on win, with flag, no interface,
+// TODO test POC on android
+
+
+//TODO optional bg layer
+
+//TODO fillmode scroll buttons
+//TODO simple x surfs undo on current frame would be cool to debug color
+
+//TEST wav cut paste as there is some logic to move on save 
+
+
+//BUG rename / shift of wav not working on android
+// check if link with paste range
+//use C as marker for initial wav
+//new button in settings to paste wav ( knowing that not perfect due to frame order)
+//171111 still, after some days, wav still shifted
+
+//BUG fill of clear color sometimes makes dithered pattern at least on android
+//171111 also happens with normal color
+
+//TODO decoration if frame is covered by sound playback
+
+//TEST fill mode with clear color if eraser enabled
+// works on windows, test workaround on android note 4 note 8
+
+
+//2 fingers zoom / zoom
+// -- first keyboard events, joystick
+//PB SDL2 app crashes when bt keyboard on, or off
+
+//TODO deco when sound on frame
+//TODO erase all wavs on save and resave them with correct number ? keep track of intial number and move to new ?
+// rename wavs on save and reset metacounter
+//TODO copy of sound metadata around when inserting/ contracting
+
+
+//WIP chose clear color
+// parameterize clear color on load if metadata file present,
+// otherwise use white as default
+
+//TODO add button to pick clear color from palette
+// should resave and reload to make alpha in the gpu texs consistent
+
+//TODO if clear color changed, 
+// save all frames REPLACING CLEAR COLOR IN SURFS WITH NEW and situation should be ok
+// > surfs on android and win saved using brute force approach ( clear /light table color is on gpu and copied )
+// > flag should be passed to copy back function to replace old clear color with new clear color
+// > all frames should be recomposed from files/ or reuploaded?  ( risky !!!!!!! )
+
+
+// if clear color is changed, on save, update clear color , then reload
+
+
+//TODO enable fill with clear color
+
+//TODO change buffer surf to rgb 24 as we never use alpha
+
+//WIP palette screen loading bmp from ressource
+//add user interface button for palette (no more pick right now)
+//had to keep surf to pick colors because copy back from video memory doesn4t work on android 
+// (slightly different tex creation from frames ?)
+
+//WIP dodonpachi draw tool
+// refactoring of edit loop
+// display cursor
+// move cursor
+//paint by moving
+// dodonpachi mode toggle in settings
+//dodonpachi mode paint toggle displayed on main edit
+
+
+
+//undo using paint surf merged in certain conditions,
+// or keep several older surfs ? (easier, more versatile, less code to plug )
+// could be ( undo buffer , number of frame ) in a stack
+// that way cross frame possible ( rotating buffer )
+
+
 
 //transparency for current picture
 
 // load playback rate from file / configure screen?
+
+//do new poc with only 3 tex for previous next current, test perf
 
 //WIP shadow inputs on android
 //trying to revert to base sdl java activity
@@ -25,30 +161,16 @@
 
 //on windows changing frame corrupts pic when round eraser is set > work around in place
 
-
 //stable ! during qa week:
 //test current version on pi
-//-> fix new  flicker one note 3 neo 
-// -> happens when in round brush mode
-//scrolling or playing in roundbrush mode makes frames dirty > they are all saved
-//reintegrate timecodes 
-//TODO -> script to multiply frames from timecodes.txt
-
-//add inib on too touchy touch event
-//POC on SDL 2.0.5 to see if hidden in our event loop
-
-//WIP 8bpp load to do palette in gfx2
-
 
 //cut up in unit tests
-
 
 
 // test operation to delete file again ( once very stable )
 
 //load 8bit surface ( to be able to choose palette on device in grafx2 )
 
-//migrate first unit tests in 2.0.5
 //test units on android and windows and pi
 
 //WIP save 24bpp only 
@@ -58,60 +180,24 @@
 //TODO move sound references when shifting
 //for each frame load, load wave if there is one 
 //on playback , trigger if there is one on frame start
-//TODO update java tool to author correct wav header
-//TODO generate script on save to merge wav and mp4s using ffmpeg
+//TODO python scripts to merge wav and mp4s using ffmpeg
 //TENTATIVE maybe storyboard view where sound clips can be movedata
 // colored bars
 
 
-//DONE flood fill
-//implement simplest recursive algorithm
 
 //DONE cut alpha as blending wrong on android
 //pasting white below could be a solution but then overlap of 2 transparents would be impossible
 
 //idea: objectify state to open several projects at once
 
-//160215 prios:
-//refactor GLOBAL disprect in cvsdisprect DONE
-//move storage to sd card folder to prevent flash fail on internal FAIL >
-//> could not find a reliable way to find extSdCard path
-//TODO put an optional define to samsung sd card location 
-
-
-//paste move ( full frame ), new interface state where you can move the pasted frame before commit DONE
-// paste position with clip wip DONE
-// selection rectangl DONE 
-// selection scale DONE ( recylcle star anim around poney )
-//clear page ( to use above ), 
-//paste move ( rectangle in frame )
-//do not make a copy, just store rectangle sel and display source over normal render with validate button
-
-
 //TODO frame delete ( wrong order of treatment and SDL del file option )
-
-
-//160201 prios :
-// sound on device
-// cut part of frame and paste move
-// fill with color
-
-// gl es blending to render target
 
 //DONE stop play anywhere
 
 //DONE play from anywhere
-//generate script to merge sound
-// ( even if ffmpeg only works from beginning,
-// generate .sh with several instructions to create a several mp4s,
-// then merge them )
-// rect cut and paste ( movable )
-// fill
-// 2 fingers zoom
-// settings screen crash after many brush change ( supposedly small brush )
 
-//round brush
-//10 80 support
+
 
 //**************  GENERAL BENCHMARKING ***************
 #define BENCH true
@@ -131,21 +217,17 @@
 #include "composebrush.h"
 #include "state.h"
 #include "floodfill.h"
+#include "cleanartifacts.h"
 
 #ifdef __ANDROID_API__
 #include "../SDL/include/SDL_opengles2.h"
 #endif
 #include <fstream>
-//using std::ifstream;
-//using std::fstream;
 #include <iostream>
 using namespace std;
 
 //PRIORITIES:
 
-//WEEK 160111
-// 1080p chichou
-// palette screen by project ( extra bitmap )
 // delete button test > the save shift order treatment works for add but not for delete
 // ( every shifted from delete is copied from last frame )
 //TODO save delete in reverse order, IN PUSH BUTTON 
@@ -169,219 +251,56 @@ using namespace std;
 // zzn save finished,about to regenerate metadata
 
 
-//SOLVED WAS STATIC ALLOC read pixels failing on note 3 :
-// direct gl call does not hang on hello gl2 
-// > do a unit test in hello gl 2
-// > try direct gl call inside program in a define block
-// ( using sdl_gles.h )
-
-//TODO change package and icon of dev version
-
-
-//FIXED  save of dirty frames doesn t work anymore ( dependeny on template.bmp)
-//TODO remove dependency on template.bmp
-
-
-
-//WIP color pick andro
-// writing color pick from rt like andro save
-// BUG only picks black
-//DONE > workaround : use copy to surf from save and pick inside
-//DONE refac save to externalize copy to surf
-
 //TODO blending is not correct on android if brush is transparent,
 //blending seems to be done with black instead of white
 //TO TEST we copy to a streaming tex, then blit to rt tex ; maybe clean with white transp rt first?
 //already cleaned before blit !!!!
 
-
-//TEST realloc brush from new color
-//TEST changing default paint color to red works
-// BUG doesn t paint successfully after recompose with new color
-//TODO display brush with current color
-
-//TODO 1080 support pour chichou
-//DONE open screen with default px then adapt user interface to it
-
-//DONE flick button uses fix coordinates ( stops after a while )
-
-//DONE center view
-
-//DONE adjust buttons to the space available
-// > new "button zoom" factor , for 720p we double the button size ( for test )
-//all defines are related to this buttonzoomfactor
-// it is calculated on startup
-//TODO center brush at stylus touch
-//TODO full screen clear, like what is done on add/append as a hack
 //TODO HIDE delete bug, more testing ( consecutive deletes killed the project )
 
-//TODO save on root of the phone pour chichou
-
-//play from current frame
-//stop play when touch
-
-
-//TODO the new brush paint seems slower on note 8, maybe test revert/ switchable solution
-
-//TODO sdl_render_rect bug solved but other crash on settings screen
-// ( accidental pr press ? )
-
-
-//TODO interim in place, but the bug triggers by just visiting the setting screen
-// without doing anything
-//> start
-//> go to setting screen
-//> exit setting screen 
-//> save
-//> CRASH after save
-
-
-//TODO interim solution allocate brush just one time and only change clipping ,
-//hoping no perf loss
-
-//TODO on android, crashes after save as soon as the brush has been resized one time
-// doesn't crash on pc
-//mutualize brush dealloc / creation code
-//provide alternate implementation with a big streaming texture clipped
-
-//TODO pb on crash after last frame save sometimes
-//( since sdl mixer integration ) around 2 weeks before 150112, before sound
-//( happened since on version with no sound )
-//TODO remove sound lib from linker / include also ?
-
-//crash 151201 -> edit last frame, multiple brush change, then save crash
-// see text file
-
-//crash 6:56 pm >>  2nd frame >> resize brush >> paint>> toggle erase >> errase >> save <>crash
-
-//TODO put log on device read example and put it in textview example from sdk,
-//to "query " zzn logs on the go after a crash
-
-//if unstability on brush resize/ change ,
-//overhaul this part to allocate a brush at max texture size and stream to it and clip to change 
-// brush ( to reduce memory allocation )
-//make eraser composition correctly ( works by accident ) and make it round
-// mutualize brush composition code
-//make 
-
-//unstability reports ( after sound disable in define/java ) :
-//subway > couple of frames added , edits , brush change >> crash on paint coming bak from brush change
-//		> loss of data
-
-//subway > edited one frame, added one frame couple of brush changes > saved >> crash AFTER save no loss of data
-// could not reproduce
-
-//TODO pb on new project with no template> crashes
 
 
 //WIP brush composed with semi alpha on border
 
-//WIP unstability since around sound integration
-//	>> define to disable sound globally on C side OK
-//  >> sound disabled in java OK
-//  >> SWITCH to disable mixer on java ? TODO 
-//TODO minimal sound
-//FROZEN separate poc to record sound using native-audio example
-//POC TO RECORD USING JAVA is ok but not wav,
-//WIP clone media recorder class and try to put audio recorder 
-//from sample inside
-//TODO try to record while playback ( doubt full )
-// TODO change to PCM recording
-//	>>WIP trying to get pcm recording to work with AudioRecord
-	//>> SEE LOGCAT OUTPUT JUST FROM JAVA EXAMPLE
-//TODO play soundtrack with sdl mixer, if present ( PCM )
-//FROZEN playback sound ( sl es ? )
-//FROZEN record sound ( sl es ? )
-//future :  a sample startable by frame number,
-// wav file named like the frame to avoid metadata
-
-
-//TODO time codes capability
-//TODO put it in file name to avoid metadata
-// >	003_5.bmp for "hold for 5 frames"
-// > an expand.sh script could be generated from c to duplicate frames and keep a correct order
-// > try 003_01 003_02 003_04
-// to easily concatenate/ import list of files elsewhere
-
 // interpolate on/off setting
-//brush size DONE
-//TODO display brush
-//TODO brush adjust without releasing stylus
-//eraser size WORKS BY MISTAKE
-
-//TODO visual decoration when in selection range
 //HACK just pasting range after selection would be easier to begin with
-//TODO paste range before sel
-
-//delete frame WIP TEST
-//contract WIP 
-// TODO last files need to be deleted when saving "contraction"
-// could be done by maintaining a "max index reached before deletion "
-// TODO move current slot whent deleting / contracting
-// TODO check that at least one frame after
-// delete range TODO
 
 
-
-//bg color define TO TEST
-//mask color define
-
-//TODO script to backup current project on device
-
-//select range
-// 2 new buttons to select begin and end ? or one stateful button ?
 //decoration for sel begin, sel , sel end
 
-//> first index, last index
 
-// paste range
-// > if first index different last index, same but on range 
-// ( or single frame just particular case )
-
-// delete range
+//TODO  delete range
 // > same code for delete one and range
 
-//2 fingers zoom
-
-
-	//TODO measure blit time with/without interpolation
-
-//flick DONE
-
-//WIP big buttons
-//settings screen (lines could be a define to begin with )
-//WIP event/ paint speed ( TODO )
-//TODO template is loaded from the external storage, not apk
-//brush size
 
 //this poc allocates all frames in video memory,
 //hungry but no scroll pb on android
-
-//TODO centered brush
-//TODO brush size
-//TODO white bg instead of black
-
-//TODO save on sdcard
-
-
-//TODO compare event speed with opaque rt poc ( seems less smooth to draw )
-
-//TODO palette
-
-
-
-
+// ( it probably was due to a local buffer alloc in save / push streaming tex, could be avoided now )
 
 namespace gputransparentrtpoc{
 
 	//proto
+	void resetUndo();
     void initedit();
+	void rendergpupoc(SDL_Renderer * renderer,
+		bool buttons,bool renderCursor);
+	bool checkButtonColl(int x,int y);
 
 
 	//folder of the current project
 	char projectPath[512];
 
+	//proto
+	Uint16 cb=0;
+	Uint16 ce=0;
 
+
+	//WIP transparent color is parameterizable now
+	Uint8 clearR=CL_R;
+	Uint8 clearG=CL_G;
+	Uint8 clearB=CL_B;
+	
+	
 	//for mobile where we don't pre know the screen size
 	int sw=0;
 	int sh=0;
@@ -406,6 +325,9 @@ namespace gputransparentrtpoc{
 	float zoom=1; //canvas
 	float buttonZoom=1; // preinit for windows?
 
+	//flag for BEHIND paint mode
+	bool BEHIND=false;
+	
 	//WIP this is used to determine initial texture size, but scale is actually used by gadget
 	Uint16 brushRadius= 
 						// 8
@@ -430,6 +352,11 @@ namespace gputransparentrtpoc{
 	//32bpp, used when geting data back from gpu
 	SDL_Surface * bufferSurf=NULL;
 
+	//palette texture for color pick screen
+	//she loading code takes 24 and 32
+	SDL_Texture * palette=NULL;
+	SDL_Surface * paletteSurface=NULL;
+	
 	//TODO 24bpp, to always save 24bpp for simplicity
 	SDL_Surface * saveSurf=NULL;
 	
@@ -441,8 +368,17 @@ namespace gputransparentrtpoc{
 	Tex project[MAX_FRAME_NMBER];
 
 	//streaming access, use to initially fill the rts
-	SDL_Texture * tmp;
+	SDL_Texture * tmp=NULL;
 
+	//behind paint mode
+	SDL_Texture * pane=NULL;
+	
+	//undo buffer on which pane is pasted
+	const Uint8 undoDepth=3;
+	SDL_Texture * undoBuf[undoDepth];
+	Sint8 currentUndoBuf=0;//this changes as we paint
+	Sint8 currentUndoDepth=0;//how many steps undo can go back
+	
 	// ONLY POINTERS  ( points to buffer )
 	//onion skin
 	SDL_Texture * previous = NULL;
@@ -487,6 +423,36 @@ namespace gputransparentrtpoc{
 		);
 	void blittexoncleanrt(SDL_Renderer * renderer,SDL_Texture * tgt,SDL_Texture * src);	
 
+	//mutualized to be usable for undo buffer creation
+	SDL_Texture * createFrameTexture(){
+				SDL_Texture * ret=SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+												CVSWDTH,CVSHGTH);
+				//TODO we should maybe clear to white transparent, so that after blending from
+				// the tmp tex, blend will be ok with "bg"
+												
+				SDL_SetTextureBlendMode(ret,SDL_BLENDMODE_BLEND);
+				
+				SDL_SetRenderTarget( renderer, ret );
+			
+			//tentatively commented as doesn't work on android gles2
+			//reactivated to remove garbled graphics on note8 andro 4
+			//spaghetti : was not working to paste content on target after white clean up ( on note 3 neo andro 5)
+			//( round brush ), but necessary when loading one note 8 andro 4 ( clear render target with square not working there ? )
+			//TODO externalise both functions
+			
+			//this block doesn't work on note 3 and is necessary on note 8!!!!
+			
+			SDL_SetRenderDrawColor(renderer,
+			
+			// CL_R,CL_G,CL_B,
+			clearR,clearG,clearB,
+			0X00);
+			SDL_RenderClear(renderer);
+
+			return ret;
+		
+	}
+	
 	//TODO refactor and replace with one buffer surf
 	void loadprojectsurfs(){
 		int j;
@@ -496,6 +462,7 @@ namespace gputransparentrtpoc{
 			project[j].shifted=false;
 			project[j].timecode=1;
 			project[j].snd=NULL;
+			project[j].wavFileNumberOnDisk=0;
 			strcpy(project[j].loadedfrom,"\0");
 		}
 	
@@ -567,29 +534,32 @@ namespace gputransparentrtpoc{
 				LOGD("zzn %d exists, is loaded \n",i);
 				//insert logic here
 				LOGD("zzn %d exists, allocate texture \n",i);
-				project[i].tx=SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
-												CVSWDTH,CVSHGTH);
-				//TODO we should maybe clear to white transparent, so that after blending from
-				// the tmp tex, blend will be ok with "bg"
-												
-				SDL_SetTextureBlendMode(project[i].tx,SDL_BLENDMODE_BLEND);
 				
-									Uint8 ret=SDL_SetRenderTarget( renderer, project[i].tx );
+				project[i].tx=createFrameTexture();
+				//extract for undo buff rotation
+				// project[i].tx=SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+												// CVSWDTH,CVSHGTH);
+				// //TODO we should maybe clear to white transparent, so that after blending from
+				// // the tmp tex, blend will be ok with "bg"
+												
+				// SDL_SetTextureBlendMode(project[i].tx,SDL_BLENDMODE_BLEND);
+				
+									// Uint8 ret=SDL_SetRenderTarget( renderer, project[i].tx );
 			
-			//tentatively commented as doesn't work on android gles2
-			//reactivated to remove garbled graphics on note8 andro 4
-			//spaghetti : was not working to paste content on target after white clean up ( on note 3 neo andro 5)
-			//( round brush ), but necessary when loading one note 8 andro 4 ( clear render target with square not working there ? )
-			//TODO externalise both functions
+			// //tentatively commented as doesn't work on android gles2
+			// //reactivated to remove garbled graphics on note8 andro 4
+			// //spaghetti : was not working to paste content on target after white clean up ( on note 3 neo andro 5)
+			// //( round brush ), but necessary when loading one note 8 andro 4 ( clear render target with square not working there ? )
+			// //TODO externalise both functions
 			
-			//this block doesn't work on note 3 and is necessary on note 8!!!!
+			// //this block doesn't work on note 3 and is necessary on note 8!!!!
 			
-			SDL_SetRenderDrawColor(renderer,
+			// SDL_SetRenderDrawColor(renderer,
 			
-			// 0X00,0X00,0X00,
-			CL_R,CL_G,CL_B,
-			0X00);
-			SDL_RenderClear(renderer);
+			// // CL_R,CL_G,CL_B,
+			// clearR,clearG,clearB,
+			// 0X00);
+			// SDL_RenderClear(renderer);
 
 				
 				
@@ -619,6 +589,7 @@ namespace gputransparentrtpoc{
 			// "slash.wav"
 				file
 			);
+			project[i].wavFileNumberOnDisk=i;
 		LOGD("sound trigger for frame %d is %d \n",i,project[i].snd);
 
 			
@@ -731,12 +702,13 @@ void saveFrame(char * path, int idx){
 		LOGD("zzn save finished,about to regenerate metadata \n");
 
 		LOGD("zzn using path %s\n",path);
-		//TODO all is saved we reset metadata such as original file
+		// all graphics is saved we reset metadata such as original file
 		for( i= 0;i<max;i++){
 
 			//composing new "loadedfrom"
 			strcpy(newsrc,path);
 			strcat(newsrc,"frame");
+
 			//TODO append num
 			snprintf(num,sizeof(num),"%03d",i);
 			strcat(newsrc,num);
@@ -753,7 +725,46 @@ void saveFrame(char * path, int idx){
 
 		
 	}
-		
+
+	//prototype
+	void saveTranspCol();
+
+	void moveWavsAround(){
+		//reversing not to overwrite wavs by accident
+		for(Sint16 i=(frameNumber()-1);i>=0;i--){
+			LOGD("checking tex %d \n",i);
+			if(project[i].snd !=NULL && i!=project[i].wavFileNumberOnDisk){
+
+							//snprintf(num,sizeof(num),"%03d",i);
+				char num[4];
+				//we need to compose both file names and move files around
+				char oldw[512];
+				strcpy(oldw,projectPath);
+				strcat(oldw,"frame");
+				snprintf(num,sizeof(num),"%03d",project[i].wavFileNumberOnDisk);
+				strcat(oldw,num);
+				strcat(oldw,".wav");
+				
+
+				char neww[512];
+				strcpy(neww,projectPath);
+				strcat(neww,"frame");
+				snprintf(num,sizeof(num),"%03d",i);
+				strcat(neww,num);
+				strcat(neww,".wav");
+
+				LOGD("%s to be renamed %s \n",oldw,neww);
+
+				rename(oldw,neww);
+
+				//rename done , we need to reset index
+				project[i].wavFileNumberOnDisk=i;
+				
+				
+			}
+		}
+	}
+
 	void saveProjectFrames(){
 		LOGD("zzn save begin \n");
 
@@ -762,7 +773,12 @@ void saveFrame(char * path, int idx){
 		// false //for debugging
 		true // we cache save !!!!!
 		);
+
+		moveWavsAround();
+
+
 		saveTimeCodes(projectPath,project,frameNumber());
+		//saveTranspCol();
 		LOGD("zzn save end \n");
 	}
 	
@@ -811,9 +827,9 @@ void saveFrame(char * path, int idx){
 		if(activeBrush==roundEraser){
 			clipRect.x=TOFF_ROUND_ERASER_X;
 			clipRect.y=TOFF_ROUND_ERASER_Y;
-		}else if(activeBrush==eraser){
-			clipRect.x=TOFF_ERASER_X;
-			clipRect.y=TOFF_ERASER_Y;
+		}else if(BEHIND==true){
+			clipRect.x=TOFF_CANCEL_X;
+			clipRect.y=TOFF_CANCEL_Y;
 		}else if(activeBrush==brush){
 			clipRect.x=TOFF_BRUSH_X;
 			clipRect.y=TOFF_BRUSH_Y;
@@ -827,8 +843,10 @@ void saveFrame(char * path, int idx){
 
 		dispRect.x=BTN_PLAY_UL_X;
 		dispRect.y=BTN_PLAY_UL_Y;
-		clipRect.x=TOFF_PLAY_X;
-		clipRect.y=TOFF_PLAY_Y;
+		// clipRect.x=TOFF_PLAY_X;
+		// clipRect.y=TOFF_PLAY_Y;
+		clipRect.x=TOFF_FILL_X;
+		clipRect.y=TOFF_FILL_Y;
 		SDL_RenderCopy(renderer,
 		buttons, 
 		&clipRect,
@@ -886,6 +904,8 @@ void saveFrame(char * path, int idx){
 		&dispRect
 		);
 
+		
+		
 		dispRect.x=BTN_SETTINGS_UL_X;
 		dispRect.y=BTN_SETTINGS_UL_Y;
 		clipRect.x=TOFF_SETTINGS_X;
@@ -896,8 +916,19 @@ void saveFrame(char * path, int idx){
 		&dispRect
 		);
 
+		dispRect.x=BTN_UNDO_UL_X;
+		dispRect.y=BTN_UNDO_UL_Y;
+		clipRect.x=TOFF_UNDO_X;
+		clipRect.y=TOFF_UNDO_Y;
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		&dispRect
+		);
+		
+		
 		int i,offset;
-		//adding decorations if time code !=10
+		//adding decorations if time code !=1
 		offset=BTN_BASE_W /4;
 		dispRect.w=offset;
 		dispRect.h=offset;
@@ -916,7 +947,38 @@ void saveFrame(char * path, int idx){
 			}
 		}
 		
+		// decorate if in selection range
+		if(nb_edit_slot <=ce  && nb_edit_slot >= cb ){
+			
+			dispRect.w=BTN_BASE_W /4;
+			dispRect.h=offset;
+			dispRect.x=DEC_CR_UL_X;
+			dispRect.y=DEC_CR_UL_Y;
+			clipRect.x=TOFF_CR_X;
+			clipRect.y=TOFF_CR_Y;
+			SDL_RenderCopy(renderer,
+			buttons, 
+			&clipRect,
+			&dispRect
+			);
+		}
 		
+		// decorate if in sound starts at this frame
+		if( project[nb_edit_slot].snd!=NULL ){
+		//TODO display and add globstruct variable
+			dispRect.w=BTN_BASE_W /4;
+			dispRect.h=BTN_BASE_W /4;
+			dispRect.x=DEC_SND_UL_X;
+			dispRect.y=DEC_SND_UL_Y;
+			clipRect.x=TOFF_SND_X;
+			clipRect.y=TOFF_SND_Y;
+			SDL_RenderCopy(renderer,
+			buttons, 
+			&clipRect,
+			&dispRect
+			);
+		}
+
 	}
 	
 
@@ -931,12 +993,13 @@ void saveFrame(char * path, int idx){
 	
 	void lightTableDrawCalls(){
 		SDL_SetRenderDrawColor(renderer,
-		// 0X00,0X00,0X00,
-		CL_R,CL_G,CL_B,
+		clearR,clearG,clearB,
+		// CL_R,CL_G,CL_B,
 		//not sure if the define is used for render target,
-		//we want a light gray to see where canvas ends
 		// 0XF0,0XF0,0XF0, but then we see the gray below the light table :p
 		0X00);
+		// LOGD(" DBG ltdc, clear color %d %d %d \n",clearR,clearG,clearB );
+
 		SDL_RenderClear(renderer);
 		
 		//for onion skinning
@@ -945,46 +1008,23 @@ void saveFrame(char * path, int idx){
 		SDL_SetTextureAlphaMod(next,32);
 		SDL_RenderCopy(renderer, next, NULL, &cvsDispRect);
 		
+		if(BEHIND){
+		    SDL_RenderCopy(renderer, pane, NULL, &cvsDispRect);
+			// LOGD("rendering behind \n");
+			
+		}
+		
 		SDL_SetTextureAlphaMod(project[nb_edit_slot].tx,255);
 		SDL_RenderCopy(renderer, project[nb_edit_slot].tx, NULL, &cvsDispRect);
+
+		if(!BEHIND){ //normal mode, we paint on a glass pane until stylus released
+		    SDL_RenderCopy(renderer, pane, NULL, &cvsDispRect);
+			// LOGD("rendering behind \n");
+			
+		}
 	
 	}
 	
-	//we pass buttons as parameter,
-	//as on gles target rt change clears screen
-	void rendergpupoc(SDL_Renderer * renderer,
-		bool buttons){
-		SDL_SetRenderTarget(renderer,NULL);
-
-		lightTableDrawCalls();
-		
-		// SDL_SetRenderDrawColor(renderer,
-		// // 0X00,0X00,0X00,
-		// CL_R,CL_G,CL_B,
-		// // not sure if the define is used for render target,
-		// // we want a light gray to see where canvas ends
-		// // 0XF0,0XF0,0XF0, but then we see the gray below the light table :p
-		// 0X00);
-		// SDL_RenderClear(renderer);
-		
-		// // for onion skinning
-		// SDL_SetTextureAlphaMod(previous,32);
-		// SDL_RenderCopy(renderer, previous, NULL, &dispRect);
-		// SDL_SetTextureAlphaMod(next,32);
-		// SDL_RenderCopy(renderer, next, NULL, &dispRect);
-		
-		// SDL_SetTextureAlphaMod(project[nb_edit_slot].tx,255);
-		// SDL_RenderCopy(renderer, project[nb_edit_slot].tx, NULL, &dispRect);
-		
-		if(buttons)renderbuttons();
-		
-		SDL_RenderPresent(renderer);
-
-		//debug for note 3 neo flicker
-		//LOGD("zzn render gpu poc\n");
-
-	}
-
 	void saveRTCanvasToSurf(int slot);
 
 	void testSaveTexUsingFrameBuffer();
@@ -1034,24 +1074,9 @@ void saveFrame(char * path, int idx){
 	void blittexoncleanrt(SDL_Renderer * renderer,SDL_Texture * tgt,SDL_Texture * src){
 
 
-			// clearRenderTargetWithSquareEraser(tgt);
 
 			Uint8 ret=SDL_SetRenderTarget( renderer, tgt );
 			
-			//tentatively commented as doesn't work on android gles2
-			//reactivated to remove garbled graphics on note8 andro 4
-			//spaghetti : was not working to paste content on target after white clean up ( on note 3 neo andro 5)
-			//( round brush ), but necessary when loading one note 8 andro 4 ( clear render target with square not working there ? )
-			//TODO externalise both functions
-			
-			//this block doesn't work on note 3 and is necessary on note 8!!!!
-			
-			// SDL_SetRenderDrawColor(renderer,
-			
-			// // 0X00,0X00,0X00,
-			// CL_R,CL_G,CL_B,
-			// 0X00);
-			// SDL_RenderClear(renderer);
 
 			
 		   SDL_Rect destRect = 
@@ -1089,15 +1114,25 @@ void saveFrame(char * path, int idx){
 			}
 	}
 
+	
+	SDL_Texture * toPaintTo=NULL;
 	//interpolating events at this stage
 	void paintHandlingUI(int prevxc,int prevyc,int xc, int yc,SDL_Renderer * renderer){
+	
+		// if(BEHIND){
+			toPaintTo=pane;
+		// }else{
+	
+		 // toPaintTo=current;
+		// }
+		// else behind
 	
 		//TODO interpolate events if applicable, and do all the blits in one render target change below
 		calculateTraj(interpolated,prevxc,prevyc,xc,yc);						
 		
 								paintCanvas
 								(interpolated,renderer,
-								current,
+								toPaintTo,
 								activeBrush
 								);
 	}
@@ -1193,14 +1228,14 @@ void saveFrame(char * path, int idx){
 		}
 		
 		//we dont need a
-		// if(surf_b==0 && surf_g==0 && surf_r==0){
 
-		if(surf_b==LT_B && surf_g==LT_G && surf_r==LT_R){
+		// if(surf_b==CL_B && surf_g==CL_G && surf_r==CL_R){
+		if(surf_b==clearB && surf_g==clearG && surf_r==clearR){
 			onion_a=0;
 			//this is a workaround so that blending of the brush is correct
-			surf_b=255;
-			surf_g=255;
-			surf_r=255;
+			// surf_b=25;
+			// surf_g=255;
+			// surf_r=255;
 		}else{
 			onion_a=just_tranp;		
 		}
@@ -1238,38 +1273,33 @@ void saveFrame(char * path, int idx){
 	//clearing and rendering on frame buffer, then saving
 	//BUG: on android gles, doesn't work
 	void texToBufferSurfUsingFB(
-		int slot
-		// ,
-		// char * file
+		SDL_Texture * tex
 	){
 	
 	LOGD("tex to buffer surf using fb /n");
 	Uint32 bench = SDL_GetTicks();
 	
-	//old school
 		SDL_SetRenderTarget(renderer,NULL);
 		SDL_SetRenderDrawColor(renderer,
-		// 0X00,0X00,0X00,
-		CL_R,CL_G,CL_B,
-		0X00
-		//255 //tested for clear color pb on direct 3D
-		);
-		
-		
-		
+		// CL_R,CL_G,CL_B,
+		clearR,clearG,clearB,
+		0XFF);
 		SDL_RenderClear(renderer);
 			
 		   SDL_Rect dispRect = 
 			{0,0,
 			CVSWDTH,CVSHGTH};
 			//we fiddle with it when scrolling
-			SDL_SetTextureAlphaMod(project[slot].tx,255);
-		SDL_RenderCopy(renderer, 
-		project[slot].tx
+//			project[slot].tx
+			SDL_SetTextureAlphaMod(
+			tex
+			,255);
+//		project[slot].tx
+		SDL_RenderCopy(renderer,
+		tex
 		, NULL, &dispRect);
 		SDL_RenderPresent(renderer);
 		
-		//TODO could we pause when we are there ?
 		
 		
 		int pwidth=CVSWDTH;
@@ -1317,6 +1347,9 @@ void saveFrame(char * path, int idx){
 				//r in surf
 				 ((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)+2]=
 				 ((Uint8 *)readpixels)[4*(pwidth*j+i)+3];
+				//a in surf
+				//we only translate alpha to transp on gpu side otherwise too hard to debug graphically
+				 ((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)+3]=255;
 				
 			}
 		}
@@ -1325,35 +1358,41 @@ void saveFrame(char * path, int idx){
 		LOGD("zzn copy from fb to surf ms %d \n",bench);
 
 		
-		// SDL_SaveBMP(
-		// // loadedsurfs[slot]
-		// bufferSurf
-		// ,file);
-		
-		
 
 		
 	}
 	
+	
+	//TODO refac to take tex ref
 	//proto
 	void texToBufferSurfUsingRT(
-		int slot
-		// ,char * file
+		SDL_Texture * tex
 	);
+
+	void copyTextureToBufferSurf(SDL_Texture * tex){
+		
+		//DBG testing to see if whole prg works with gl on win32
+		
+			// #ifndef __ANDROID_API__
+			// texToBufferSurfUsingFB(
+			// tex
+			// );
+			// #endif
+			
+			// #ifdef __ANDROID_API__
+			texToBufferSurfUsingRT(
+			tex
+			);
+			// #endif
+	
+	}
+
 	
 	//ahem plat independant entrypoing
 	void copyTexToBufferSurf(int slot){
-			#ifndef __ANDROID_API__
-			texToBufferSurfUsingFB(slot
-			);
-			#endif
-			
-			#ifdef __ANDROID_API__
-			texToBufferSurfUsingRT(slot
-			);
-			#endif
-	
+		copyTextureToBufferSurf(project[slot].tx);
 	}
+
 	
 	
 	//somehow on direct3d pb detected on copy tex to buff
@@ -1389,12 +1428,10 @@ void saveFrame(char * path, int idx){
 	
 	
 	
-	//TODO flag to invert for gles target
-	//when changing slot we need to copy back from gpu
 	
 	void texToBufferSurfUsingRT(
-		int slot
-		// ,char * file
+		SDL_Texture * tex
+//		int slot
 	){
 		//set render target DOESN'T WORK in this context on dx 
 		//read pixels grabs from fb instead, but gles seems to work
@@ -1402,8 +1439,9 @@ void saveFrame(char * path, int idx){
 		Uint32 bench = SDL_GetTicks();
 
 		
+//		project[slot].tx
 		Uint8 ret=SDL_SetRenderTarget(renderer,
-		project[slot].tx
+		tex
 		);
 		LOGD("zzn readpix set render targ (0 is normal ) :%d \n",ret);
 		
@@ -1491,9 +1529,9 @@ void saveFrame(char * path, int idx){
 					// 255; // debug to identify red // indeed red in surf
 				}else{
 					//andro 5 patch for texture transp pixels
-					((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)]=LT_B;
-					((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)+1]=LT_G;
-					((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)+2]=LT_R;
+					((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)]=clearB;
+					((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)+1]=clearG;
+					((Uint8 *)bufferSurf->pixels)[ 4*(pwidth*j+i)+2]=clearR;
 				
 				}
 					
@@ -1577,14 +1615,17 @@ void saveFrame(char * path, int idx){
 //TODO 
 void toggleEraser(){
 	//simple slot change
-	if(activeBrush==brush){
-		
+	if(activeBrush==brush && BEHIND==false){
+		    BEHIND=false;
 			activeBrush=roundEraser;
 	}else if(activeBrush==roundEraser){
 		//activeBrush=eraser;
+		// activeBrush=brush;
 		activeBrush=brush;
-//	}else if(activeBrush==eraser){
-//		activeBrush=brush;
+		BEHIND=true;
+	}else if(BEHIND==true){
+		activeBrush=brush;
+		BEHIND=false;
 	}
 
 }	
@@ -1607,11 +1648,11 @@ void init_play();
 			for(i=0;i<CVSWDTH;i++){
 				
 				if(
-				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)]==CL_B
+				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)]==clearB
 				&&
-				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]==CL_G
+				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]==clearG
 				&&
-				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]==CL_R
+				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]==clearR
 				&&
 				((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+3]!=0
 				){
@@ -1631,10 +1672,9 @@ void init_play();
 		//CVSWDTH,CVSHGTH
 		for(j=0;j<CVSHGTH;j++){
 			for(i=0;i<CVSWDTH;i++){				
-					//clear color found and alpha not 0
-					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+0]=0;
-					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]=0;
-					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]=0;
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+0]=clearR;
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]=clearG;
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]=clearB;
 					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+3]=255;
 			}
 		}
@@ -1647,10 +1687,10 @@ void init_play();
 		
 		
 		//WINDOWS DEBUG
-		LOGD("ctex debug.bmp SAVE");
-		SDL_SaveBMP(
-				bufferSurf
-				,"debug.bmp");
+		// LOGD("ctex debug.bmp SAVE");
+		// SDL_SaveBMP(
+				// bufferSurf
+				// ,"debug.bmp");
 		
 		//at this point all white is 255 on windows (patch to copytex buffer surf, and debug save is ok)
 		
@@ -1670,170 +1710,6 @@ void init_play();
 	}
 	
 	
-//returns true if click consumed ( no paint )
-bool checkButtonColl(int x,int y){
-	LOGD("zzn checking buttons\n");
-	if( 
-		x < (BTN_SETTINGS_UL_X+BTN_BASE_W)
-		&& x > BTN_SETTINGS_UL_X
-		&&	y < (BTN_SETTINGS_UL_Y+BTN_BASE_W)
-		&& y > BTN_SETTINGS_UL_Y
-	){
-		LOGD("zzn settings screen \n");
-		mode=settings;
-		return true;
-	}else if( 
-		x < (BTN_ADD_UL_X+BTN_BASE_W)
-		&& x > BTN_ADD_UL_X
-		&&	y < (BTN_ADD_UL_Y+BTN_BASE_W)
-		&& y > BTN_ADD_UL_Y
-	){
-		LOGD("zzn btn add \n");
-		appendframe(nb_edit_slot+1);
-		return true;
-	}else if( 
-		x < (BTN_FLR_UL_X+BTN_BASE_W)
-		&& x > BTN_FLR_UL_X
-		&&	y < (BTN_FLR_UL_Y+BTN_BASE_W)
-		&& y > BTN_FLR_UL_Y
-	){
-	
-		initFlick(false);
-		return true;
-	}else if( 
-		x < (BTN_FLG_UL_X+BTN_BASE_W)
-		&& x > BTN_FLG_UL_X
-		&&	y < (BTN_FLG_UL_Y+BTN_BASE_W)
-		&& y > BTN_FLG_UL_Y
-	){
-	
-		initFlick(true);
-		return true;
-	}else if( 
-		x < (BTN_PLAY_UL_X+BTN_BASE_W)
-		&& x > BTN_PLAY_UL_X
-		&&	y < (BTN_PLAY_UL_Y+BTN_BASE_W)
-		&& y > BTN_PLAY_UL_Y
-	){
-	
-		init_play();
-		return true;
-	}else if( 
-		x < (BTN_COPY_UL_X+BTN_BASE_W)
-		&& x > BTN_COPY_UL_X
-		&&	y < (BTN_COPY_UL_Y+BTN_BASE_W)
-		&& y > BTN_COPY_UL_Y
-	){
-		//HACK to test
-//		clearCurrentOfClearColorFullAlphaPixels();
-		//saveSlotToFile(nb_edit_slot,"debug.bmp");
-	
-		//set copy slot
-		copy_src=project[nb_edit_slot].tx;
-		LOGD("copy slot set to : %d \n",copy_src);
-		return true;
-	}else if( 
-		x < (BTN_PASTE_UL_X+BTN_BASE_W)
-		&& x > BTN_PASTE_UL_X
-		&&	y < (BTN_PASTE_UL_Y+BTN_BASE_W)
-		&& y > BTN_PASTE_UL_Y
-	){
-		if(copy_src!=NULL){
-			LOGD("pasting to frame \n");
-			rtcopy(renderer,
-					// project[nb_edit_slot].tx,
-					current,
-					copy_src,
-					0,0,0,0,NULL);
-			project[nb_edit_slot].dirty=true;
-			LOGD("frame %d marked dirty \n",nb_edit_slot);
-		}else{
-			LOGD(" no copyslot set \n");
-		}
-		return true;
-	}else if( 
-		x < (BTN_NXT_UL_X+BTN_BASE_W)
-		&& x > BTN_NXT_UL_X
-		&&	y < (BTN_NXT_UL_Y+BTN_BASE_W)
-		&& y > BTN_NXT_UL_Y
-	){
-		LOGD("zzn button next\n");
-		
-		//work around: on windows, next in round eraser ( clear color op)
-		//corrups canvas DOESN WORK ANYWAY
-//		if(activeBrush==roundEraser){
-//			toggleEraser();
-//		}
-		
-		
-		//TODO validation two times so far
-		int tgt = nb_edit_slot+1;
-		//we cycle to first frame
-		if( 
-			tgt>(MAX_FRAME_NMBER-1)	||	project[tgt].tx==NULL
-		){ 
-			LOGD("we cycle to first frame %d\n",tgt);
-			tgt=0;
-		}
-			
-		setEditSlot(tgt);
-		nb_edit_slot=tgt;
-
-		return true;
-	}else 	if( 
-		x < (BTN_PREV_UL_X+BTN_BASE_W)
-		&& x > BTN_PREV_UL_X
-		&&	y < (BTN_PREV_UL_Y+BTN_BASE_W)
-		&& y > BTN_PREV_UL_Y
-	){
-		LOGD("zzn button back\n");
-		
-
-		//work around: on windows, next in round eraser ( clear color op)
-		//corrups canvas
-	//	if(activeBrush==roundEraser){
-		//	toggleEraser();
-		//}
-
-		//changing behavior , <0, we get to last
-		
-		int tgt = nb_edit_slot-1;
-		if(tgt<0){ 
-			LOGD("zzn move to last frame %d\n",tgt);
-			
-			tgt=frameNumber()-1;
-		}
-		setEditSlot(tgt);
-		nb_edit_slot=tgt;
-		return true;
-	}else 	if( 
-		x < (BTN_SAVE_UL_X+BTN_BASE_W)
-		&& x > BTN_SAVE_UL_X
-		&&	y < (BTN_SAVE_UL_Y+BTN_BASE_W)
-		&& y > BTN_SAVE_UL_Y
-	){
-		LOGD("zzn save clicked\n");
-		saveProjectFrames();
-		LOGD("zzn returned from frames save \n");
-		return true;
-	}else 	if( 
-		x < (BTN_ERASER_UL_X+BTN_BASE_W)
-		&& x > BTN_ERASER_UL_X
-		&&	y < (BTN_ERASER_UL_Y+BTN_BASE_W)
-		&& y > BTN_ERASER_UL_Y
-	){
-		LOGD("zzn toggle erase clicked\n");
-		
-		//testClearRT(renderer,project[nb_edit_slot].tx);
-		toggleEraser();
-		return true;
-	}
-		
-	
-	
-	
-	return false;
-}
 	//needs renderer to be init
 	void composeEraser(){
 			//square eraser, bg 0 alpha
@@ -1844,8 +1720,8 @@ bool checkButtonColl(int x,int y){
 			SDL_SetRenderTarget(renderer,eraser);
 			//this is a try, I blit without blend mode hoping to erase
 			SDL_SetRenderDrawColor(renderer,
-			// 0X00,0X00,0X00
-			CL_R,CL_G,CL_B
+			// CL_R,CL_G,CL_B
+			clearR,clearG,clearB
 			,0X00);
 			SDL_RenderClear(renderer);
 			SDL_RenderPresent(renderer);
@@ -1853,9 +1729,13 @@ bool checkButtonColl(int x,int y){
 			//round eraser, pastes clear color with alpha 255,
 			//needs work around to fill clear color with alpha 0 afterwards
 			myRgb eraserCol;
-			eraserCol.r=CL_R;
-			eraserCol.g=CL_G;
-			eraserCol.b=CL_B;
+			// eraserCol.r=CL_R;
+			// eraserCol.g=CL_G;
+			// eraserCol.b=CL_B;
+			eraserCol.r=clearR;
+			eraserCol.g=clearG;
+			eraserCol.b=clearB;
+			
 			SDL_Surface * brushSurf = 
 			composeBrushWithAlpha(brushRadius,ALPHA_BORDER, eraserCol, GLOBAL_ALPHA);
 			roundEraser  = SDL_CreateTextureFromSurface(renderer, brushSurf);
@@ -1928,8 +1808,8 @@ bool checkButtonColl(int x,int y){
 			
 			SDL_SetRenderDrawColor(renderer,
 			
-			// 0X00,0X00,0X00,
-			CL_R,CL_G,CL_B,
+			// CL_R,CL_G,CL_B,
+			clearR,clearG,clearB,
 			0X00);
 			SDL_RenderClear(renderer);
 
@@ -1940,51 +1820,51 @@ bool checkButtonColl(int x,int y){
 		SDL_FreeSurface(tmpsurf);
 	}
 
-	//seems to have pb on android 5 note 3 neo ( garbled pixels )
-	void clearstreamingtex(SDL_Texture * streaming){
-			void* mPixels;
-		int mPitch;
+	// //seems to have pb on android 5 note 3 neo ( garbled pixels )
+	// void clearstreamingtex(SDL_Texture * streaming){
+			// void* mPixels;
+		// int mPitch;
 		
-		//let's check tex pixel format
-		Uint32 t_fmt=0;
-		SDL_QueryTexture(streaming,&t_fmt,NULL,NULL,NULL);
-		printf("tgt t_fmt%d \n",t_fmt);
-		Uint32 r,g,b,a;
-		int bpp;
-		r=0;g=0;b=0;a=0;bpp=0;
-		SDL_PixelFormatEnumToMasks( 
-			t_fmt,
-			&bpp,
-			&r,
-			&g,
-			&b,
-			&a
-			);
+		// //let's check tex pixel format
+		// Uint32 t_fmt=0;
+		// SDL_QueryTexture(streaming,&t_fmt,NULL,NULL,NULL);
+		// printf("tgt t_fmt%d \n",t_fmt);
+		// Uint32 r,g,b,a;
+		// int bpp;
+		// r=0;g=0;b=0;a=0;bpp=0;
+		// SDL_PixelFormatEnumToMasks( 
+			// t_fmt,
+			// &bpp,
+			// &r,
+			// &g,
+			// &b,
+			// &a
+			// );
 		
-		LOGD("zzn tgttex r %08X g %08X  b %08X  \n",r,g,b);
-		//even though it seems rgba,
-		//testing below shows that it is a b g r
+		// LOGD("zzn tgttex r %08X g %08X  b %08X  \n",r,g,b);
+		// //even though it seems rgba,
+		// //testing below shows that it is a b g r
 		
-		SDL_LockTexture( streaming, NULL, &mPixels, &mPitch );
-		//blit like a mad man
-		printf("prev pitch %d\n",mPitch);
-		Uint32 size = CVSHGTH *CVSWDTH;
-		int i;
+		// SDL_LockTexture( streaming, NULL, &mPixels, &mPitch );
+		// //blit like a mad man
+		// printf("prev pitch %d\n",mPitch);
+		// Uint32 size = CVSHGTH *CVSWDTH;
+		// int i;
 		
 		
-		for(i=0;i<size;i++){
+		// for(i=0;i<size;i++){
 
-			//TODO quick hack,
-			//should be put in line with define
+			// //TODO quick hack,
+			// //should be put in line with define
 		
-		((Uint8 *)mPixels)[4*i]= 0;
-		((Uint8 *)mPixels)[4*i+1]=0;
-		((Uint8 *)mPixels)[4*i+2]=0;
-		((Uint8 *)mPixels)[4*i+3]=0;
-		}
-		SDL_UnlockTexture( streaming );	
+		// ((Uint8 *)mPixels)[4*i]= 0;
+		// ((Uint8 *)mPixels)[4*i+1]=0;
+		// ((Uint8 *)mPixels)[4*i+2]=0;
+		// ((Uint8 *)mPixels)[4*i+3]=0;
+		// }
+		// SDL_UnlockTexture( streaming );	
 
-	}
+	// }
 
 	//fill slot android 5 ( corruption on previous method )
 	void initslot(int nb){
@@ -1994,6 +1874,7 @@ bool checkButtonColl(int x,int y){
 										CVSWDTH,CVSHGTH);
 		project[nb].dirty=true; //created from template so fully new								
 		project[nb].snd=NULL;
+		project[nb].wavFileNumberOnDisk=0;
 		project[nb].timecode=1;
 		LOGD(" slot %d dirty from creation \n");
 
@@ -2039,6 +1920,8 @@ bool checkButtonColl(int x,int y){
 				buf[i].shifted=false;
 				buf[i].timecode=1;
 				strcpy(buf[i].loadedfrom,"\0");
+				buf[i].snd=NULL;
+				buf[i].wavFileNumberOnDisk=0;
 			}
 			//buf ready to use
 	
@@ -2052,6 +1935,9 @@ bool checkButtonColl(int x,int y){
 					buf[i].shifted=project[i].shifted;
 					buf[i].timecode=project[i].timecode;
 					strcpy(buf[i].loadedfrom,project[i].loadedfrom);
+					buf[i].snd=project[i].snd;
+					buf[i].wavFileNumberOnDisk=project[i].wavFileNumberOnDisk;
+
 					LOGD("copying %d project to buf \n",i);
 				}else{
 					//TODO copy at i+1 to keep 'existing' slot at NULL
@@ -2060,6 +1946,8 @@ bool checkButtonColl(int x,int y){
 					buf[i+1].shifted=true;
 					buf[i+1].timecode=project[i].timecode;
 					strcpy(buf[i+1].loadedfrom,project[i].loadedfrom);
+					buf[i+1].snd=project[i].snd;
+					buf[i+1].wavFileNumberOnDisk=project[i].wavFileNumberOnDisk;
 					
 					LOGD("copying %d project to buf %d \n",i,(i+1));
 				}
@@ -2072,6 +1960,8 @@ bool checkButtonColl(int x,int y){
 				project[i].shifted=buf[i].shifted;
 				project[i].timecode=buf[i].timecode;
 				strcpy(project[i].loadedfrom,buf[i].loadedfrom);
+				project[i].snd=buf[i].snd;
+				project[i].wavFileNumberOnDisk=buf[i].wavFileNumberOnDisk;
 			}
 			//project should be with a null slot at existing now
 	}
@@ -2287,7 +2177,7 @@ bool checkButtonColl(int x,int y){
 		if(polled.pressed==false){
 			//we render gpu poc one time with buttons cause edit mode input blocking
 			rendergpupoc(renderer,
-			true);
+			true,false);
 			initedit();
 			return;
 		}
@@ -2343,8 +2233,8 @@ bool checkButtonColl(int x,int y){
 			SDL_SetRenderTarget(renderer,NULL);
 //on android the bg is not cleared on target change
 		SDL_SetRenderDrawColor(renderer,
-		// 0X00,0X00,0X00,
-		CL_R,CL_G,CL_B,
+		// CL_R,CL_G,CL_B,
+		clearR,clearG,clearB,
 		0X00);
 		SDL_RenderClear(renderer);
 			
@@ -2451,24 +2341,41 @@ bool checkButtonColl(int x,int y){
   void executeFill(Uint16 x, Uint16 y){
 			    //call flood fill
 			    LOGD("flood fill " );
-			    myRgba replacecol;
-			    replacecol.b=col.b;
-			    replacecol.g=col.g;
-			    replacecol.r=col.r;
+			copyTexToBufferSurf(nb_edit_slot);
 				
-				// if(ROUNDERASERHACK){
-					// //just a hack to test feasability
-					// replacecol.a=0; 
+				
+			    myRgba replacecol;
+				if(activeBrush==roundEraser){
+					LOGD("round eraser selected,we fill with clear color \n");
+					replacecol.b=clearB;
+					replacecol.g=clearG;
+					replacecol.r=clearR;
+				//if we need to substract, we need to blit with 0 alpha some sections, so on a tex with alpha 0 everywhere
+					//dunno how to do that on non streaming so for this special case reallocate ?
+					// SDL_DestroyTexture(rdr,project[nb_edit_slot].tx);
+					// SDL_CreateTexture
+				Uint8 ret=SDL_SetRenderTarget( renderer, project[nb_edit_slot].tx );
+				SDL_SetRenderDrawColor(renderer,
+			
+			// CL_R,CL_G,CL_B,
+			clearR,clearG,clearB,
+			0X00);
+			SDL_RenderClear(renderer);
 
-				// }else{
+
+
+				}else{
+					replacecol.b=col.b;
+					replacecol.g=col.g;
+					replacecol.r=col.r;
+				}
+				
 					replacecol.a=255; //todo might change if we can flood lt color
-
-				// }
 				
 			    //DEBUG TEST
 			    Uint8 * pix =(Uint8 *) bufferSurf->pixels;
 			    noRecFloodFill(  pix,  x,  y,  replacecol );
-//			    SDL_SaveBMP(bufferSurf,"dbgfill.bmp");
+			    //SDL_SaveBMP(bufferSurf,"dbgfill.bmp");
 
 				//TODO if round eraser hack we should be able to upload different alpha
 				loadsurftostreamingtex(
@@ -2478,14 +2385,59 @@ bool checkButtonColl(int x,int y){
 									false,
 									255
 					);
+			
 				blittexoncleanrt(renderer,project[nb_edit_slot].tx,tmp);		
 				project[nb_edit_slot].dirty=true;
 
   }
 
 
+
+	void saveFramesChangingLightTableColor(myRgb *newLTcol){
+		//TODO see list of tasks beginning of file
+		
+		
+	}
+
+
+  
+	//TODO replace this sh#t with enum :p
+	//are we picking from palette pick
+	bool paletteMode=true;
+	bool changeLightTableColor=true;
+    bool cleanColor=true;
+  
+   void cleanPixelsOfBufferSurf(myRgb * picked){
+	    int i,j;
+		for(j=0;j<CVSHGTH;j++){
+			for(i=0;i<CVSWDTH;i++){
+				//WIP if statement on pix color
+
+				if(
+				 ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)]==picked->b
+				 &&
+				 ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]==picked->g
+				 &&
+				 ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]==picked->r
+				 
+				){
+					//b
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)]=clearB;
+					// g in surf
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]=clearG;
+
+					//r in surf
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]=clearR;
+					//A in surf
+					((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+3]=0;
+				}
+			}
+		}
+	   
+   }
   
 	void pickMode(){
+		
 		picked.r=0;
 		picked.g=0;
 		picked.b=0;
@@ -2498,15 +2450,40 @@ bool checkButtonColl(int x,int y){
 			CVSWDTH*zoom,CVSHGTH*zoom};
 			// CVSWDTH,CVSHGTH};
 		SDL_SetRenderDrawColor(renderer,
-		// 0X00,0X00,0X00,
-		CL_R,CL_G,CL_B,
+		// CL_R,CL_G,CL_B,
+		clearR,clearG,clearB,
 		0X00);
 		SDL_RenderClear(renderer);
 		
-		
-		SDL_SetTextureAlphaMod(project[nb_edit_slot].tx,255);
-		SDL_RenderCopy(renderer, project[nb_edit_slot].tx, NULL, &dispRect);
-		
+		if(paletteMode){
+			SDL_RenderCopy(renderer, palette, NULL, &dispRect);			
+		}else{
+			SDL_SetTextureAlphaMod(project[nb_edit_slot].tx,255);
+			SDL_RenderCopy(renderer, project[nb_edit_slot].tx, NULL, &dispRect);
+		}
+
+		// we need to display a cancel button to go out
+		SDL_Rect clipRect = 
+			{0,0,
+			0,0};
+
+		   
+			
+	   clipRect.x = TOFF_CANCEL_X;
+	   clipRect.y = TOFF_CANCEL_Y;
+	   clipRect.w = 64;
+	   clipRect.h = 64;
+		dispRect.x=PP_CANCEL_UL_X;
+		dispRect.y=PP_CANCEL_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+			SDL_RenderCopy(renderer,
+			buttons, 
+			&clipRect,
+			&dispRect
+			);
+
 		
 		SDL_RenderPresent(renderer);
 	
@@ -2515,58 +2492,118 @@ bool checkButtonColl(int x,int y){
 			);
 		if(polled.newpress){
 			LOGD("get pick TODO andro \n");
+			if( 
+				polled.x < (PP_CANCEL_UL_X+BTN_BASE_W)
+				&& polled.x > PP_CANCEL_UL_X
+				&&	polled.y < (PP_CANCEL_UL_Y+BTN_BASE_W)
+				&& polled.y > PP_CANCEL_UL_Y
+				){
+				
+				// mode=settings;
+				initedit();
+				return;
+			}
 			Uint16 xpick = polled.x/zoom;
 			Uint16 ypick = polled.y/zoom;
-			LOGD("computed pick %d %d \n",xpick, ypick);
+			LOGD("zzn computed pick %d %d \n",xpick, ypick);
 
 
   		  if( fillmode){
-			copyTexToBufferSurf(nb_edit_slot);
 
 		    executeFill(xpick,ypick);
-		    
-		    
-		    initedit();
+			return;
+		    //WIP we add an exit button
+		    // initedit();
 		  }else{
 
 
 			
 			//
-			picked.r=LT_R;
-			picked.g=LT_G;
-			picked.b=LT_B;
+			// picked.r=CL_R;
+			// picked.g=CL_G;
+			// picked.b=CL_B;
+			picked.r=clearR;
+			picked.g=clearG;
+			picked.b=clearB;
 
 			//WIP andro version not working on less than full tex,
 			//workaround
-			copyTexToBufferSurf(nb_edit_slot);
 			
-			picked.b=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)];
-			// g in surf
-			picked.g=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)+1];
+			//TODO palette treatment
+			if(paletteMode){
+				// pb on android
+				//				copyTextureToBufferSurf(palette);
+				//pick color directly in palette
+				picked.b=((Uint8 *)paletteSurface->pixels)[ 3*(CVSWDTH*ypick+xpick)];
+				// g in surf
+				picked.g=((Uint8 *)paletteSurface->pixels)[ 3*(CVSWDTH*ypick+xpick)+1];
 
-			//r in surf
-			 picked.r=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)+2];
+				//r in surf
+				 picked.r=((Uint8 *)paletteSurface->pixels)[ 3*(CVSWDTH*ypick+xpick)+2];
+			
+			}else if(cleanColor){
+				//pick color in picture
+				copyTexToBufferSurf(nb_edit_slot);
+				picked.b=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)];
+				// g in surf
+				picked.g=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)+1];
+
+				//r in surf
+				 picked.r=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)+2];
+
+				 
+				// char debugsave[512];
+				// strcpy(debugsave,projectPath);
+				// strcat(debugsave,"beforeclean.bmp");
+				// LOGD("%s \n",debugsave);
+				
+				// SDL_SaveBMP(bufferSurf,debugsave);
+				//we need to clean all pixels of this color in buffer surf
+				cleanPixelsOfBufferSurf(&picked);
+
+				// strcpy(debugsave,projectPath);
+				// strcat(debugsave,"afterclean.bmp");
+				// LOGD("%s \n",debugsave);
+				// SDL_SaveBMP(bufferSurf,debugsave);
+				// // SDL_SaveBMP(bufferSurf,"afterclean.bmp");
+				
+				clearRenderTargetWithSquareEraser(project[nb_edit_slot].tx);
+				loadsurftostreamingtex(bufferSurf,tmp,true,255);
+				blittexoncleanrt(renderer,project[nb_edit_slot].tx,tmp);		
+				project[nb_edit_slot].dirty=true;
+				
+				//WORKAROUND it seems there are clear color pixels with full alpha
+				//we run it as a workaround
+				clearCurrentOfClearColorFullAlphaPixels();
+				 
+
+			}else{
+				//pick color in picture
+				copyTexToBufferSurf(nb_edit_slot);
+				picked.b=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)];
+				// g in surf
+				picked.g=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)+1];
+
+				//r in surf
+				 picked.r=((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*ypick+xpick)+2];
+			}
+			
 
 			
-			// #ifndef __ANDROID_API__
-			// pickInCanvasD3D(
-			// xpick
-			// ,
-			// ypick);
-			// #endif
+			LOGD("zzn result of pick %d %d %d \n",picked.r,picked.g,picked.b);
 			
-			
-			// #ifdef __ANDROID_API__
-			// pickInCanvasAndro(xpick, ypick);
-			// #endif
 			
 			//result is in global
 			//rule : we dunno select light table color
-			if( picked.r==LT_R
-			&& picked.g==LT_G
-			&& picked.b==LT_B
+			// if( picked.r==CL_R
+			// && picked.g==CL_G
+			// && picked.b==CL_B
+			if( picked.r==clearR
+			&& picked.g==clearG
+			&& picked.b==clearB
 			){
 				LOGD("light table color picked , skipping \n");
+				initedit();
 			}else{
 			    LOGD("not LT color, we change to it ");
 
@@ -2575,13 +2612,19 @@ bool checkButtonColl(int x,int y){
 				col.b=picked.b;
 				composeBrushInVideoMemory();
 				activeBrush=brush;
-
-
-				
 				LOGD("after compose brush video memory \n");
+				
+				//WIP / FROZEN not implemented yet
+				if(changeLightTableColor){
+					LOGD("change light table color \n");
+					saveFramesChangingLightTableColor(&picked);
+				}
+				
+				
 				//was painful navigation
 				// mode=settings;
 				cleaninput(&polled);
+				LOGD("brush color changed going to edit \n");
 				initedit();
 			}
 		    }
@@ -2600,8 +2643,8 @@ bool checkButtonColl(int x,int y){
 			{xorig,YORIG,
 			CVSWDTH*zoom,CVSHGTH*zoom};
 		SDL_SetRenderDrawColor(renderer,
-		// 0X00,0X00,0X00,
-		CL_R,CL_G,CL_B,
+		// CL_R,CL_G,CL_B,
+		clearR,clearG,clearB,
 		0X00);
 		SDL_RenderClear(renderer);
 		
@@ -2732,26 +2775,20 @@ bool checkButtonColl(int x,int y){
 	
 		SDL_SetRenderTarget(renderer,NULL);
 		SDL_RenderClear(renderer);
-		// rendergpupoc(renderer,false);
-		// // lightTableDrawCalls();
 	   SDL_Rect dispRect ;
 		SDL_Rect clipRect; //for buttons sprite sheet
 	   
 	   dispRect.x=cvsDispRect.x
-	   // +xpaste*zoom
 	   ;
 	   dispRect.y=cvsDispRect.y
-	   // +ypaste*zoom
 	   ;
 	   dispRect.w=cvsDispRect.w;
 	   dispRect.h=cvsDispRect.h;
-	// if(copy_src!=NULL){
 		SDL_SetTextureAlphaMod(copy_src,255);
 
 		SDL_RenderCopy(renderer,
 		copy_src, 
 		NULL,
-		// &cvsDispRect
 		&dispRect
 		);
 			
@@ -2761,13 +2798,13 @@ bool checkButtonColl(int x,int y){
 		//TODO should be compensated by zoom
 		dispRect.x=cvsDispRect.x+copy_clip_rect.x*zoom;
 		dispRect.y=cvsDispRect.y+copy_clip_rect.y*zoom;
-		dispRect.w=BTN_BASE_W;
-		dispRect.h=BTN_BASE_W;
+		dispRect.w=BTN_BASE_W/8;
+		dispRect.h=BTN_BASE_W/8;
 
-		clipRect.x=TOFF_CANCEL_X;
-		clipRect.y=TOFF_CANCEL_Y;
-		clipRect.w=64;
-		clipRect.h=64;
+		clipRect.x=TOFF_TGTUL_X;
+		clipRect.y=TOFF_TGTUL_Y;
+		clipRect.w=32;
+		clipRect.h=32;
 		SDL_RenderCopy(renderer,
 		buttons, 
 		// NULL,
@@ -2777,13 +2814,13 @@ bool checkButtonColl(int x,int y){
 
 		dispRect.x=cvsDispRect.x+(copy_clip_rect.x+copy_clip_rect.w)*zoom;
 		dispRect.y=cvsDispRect.y+(copy_clip_rect.y+copy_clip_rect.h)*zoom;
-		dispRect.w=BTN_BASE_W;
-		dispRect.h=BTN_BASE_W;
+		dispRect.w=BTN_BASE_W/8;
+		dispRect.h=BTN_BASE_W/8;
 
-		clipRect.x=TOFF_CANCEL_X;
-		clipRect.y=TOFF_CANCEL_Y;
-		clipRect.w=64;
-		clipRect.h=64;
+		clipRect.x=TOFF_TGTDR_X;
+		clipRect.y=TOFF_TGTDR_Y;
+		clipRect.w=32;
+		clipRect.h=32;
 		SDL_RenderCopy(renderer,
 		buttons, 
 		// NULL,
@@ -2833,13 +2870,19 @@ bool checkButtonColl(int x,int y){
 				mode=pastePosition;
 				return;
 			}else 
-			if(
+			if( //small ajustment on x
 				polled.x < (cvsDispRect.x+cvsDispRect.w)
-				&& polled.x > cvsDispRect.x
+				// && polled.x > cvsDispRect.x
+				// && polled.x > cvsDispRect.x
 				&&	polled.y < (cvsDispRect.y+cvsDispRect.h)
 				&& polled.y > cvsDispRect.y
 			){
 				
+				if(polled.x <= cvsDispRect.x){
+					polled.x=cvsDispRect.x;
+					//we should be able to easily select things overlaping the left border 
+				}
+
 				//click is in canvas , we have boolean to alternate between the 2 coordinates points to set
 				Uint16 xcvsCoord,ycvsCoord;
 				Uint16 tx,ty;
@@ -2854,25 +2897,25 @@ bool checkButtonColl(int x,int y){
 				if(cc_ul){
 					copy_clip_rect.x=xcvsCoord;
 					copy_clip_rect.y=ycvsCoord;
-				LOGD("adapting markers ul x y %d %d \n",copy_clip_rect.x,copy_clip_rect.y );
+				    LOGD("adapting markers ul x y %d %d \n",copy_clip_rect.x,copy_clip_rect.y );
+					
+					// let s adapt width if we are end of the screen (seems to be problematic other wise)
+					if(copy_clip_rect.x +copy_clip_rect.w>CVSWDTH){
+						copy_clip_rect.w=CVSWDTH-copy_clip_rect.x;
+						LOGD("width ajusted to %d \n",copy_clip_rect.w);
+					}
+					
 					cc_ul=false;
 				}else{
-					copy_clip_rect.w=xcvsCoord-copy_clip_rect.x;
-					copy_clip_rect.h=ycvsCoord-copy_clip_rect.y;
-					LOGD("adapting markers w h %d %d \n",copy_clip_rect.w,copy_clip_rect.h );
+
+					if(xcvsCoord>copy_clip_rect.x&&ycvsCoord>copy_clip_rect.y){
+						copy_clip_rect.w=xcvsCoord-copy_clip_rect.x;
+						copy_clip_rect.h=ycvsCoord-copy_clip_rect.y;
+						LOGD("adapting markers w h %d %d \n",copy_clip_rect.w,copy_clip_rect.h );
+					}
 					cc_ul=true;
 				}
 			
-				//TODO compute new position of pasted selection
-				// Uint16 tx,ty;
-				// tx=polled.x - cvsDispRect.x;
-				// ty = polled.y - cvsDispRect.y;
-				// LOGD("tx ty before zoom scale %d %d \n" , tx,ty);
-				// xpaste=tx/zoom;
-				// ypaste=ty/zoom;
-				// LOGD("xpaste ypaste before zoom scale %d %d \n" , xpaste, ypaste );
-				
-				// mode=pastePosition;
 			}
 
 		}
@@ -2880,6 +2923,15 @@ bool checkButtonColl(int x,int y){
 	}
 
   //** TIME CODE MODE
+
+//TODO add init method
+// store current timecode in local slot and apply only on exit
+Uint16 timecode=0;
+
+void initTimeCodeMode(){
+	timecode=project[nb_edit_slot].timecode;
+}
+
   // screen to set time code for frame : first half with one icon for frames / sec, second half for full seconds , different icon
 	void timeCodeMode(){
 		SDL_SetRenderTarget(renderer,NULL);
@@ -2902,6 +2954,26 @@ bool checkButtonColl(int x,int y){
 		&dispRect
 		);
 	   
+
+	   //apply to multiple
+	   clipRect.x = TOFF_MULTIPLE_X;
+	   clipRect.y = TOFF_MULTIPLE_Y;
+	   clipRect.w = 64;
+	   clipRect.h = 64;
+		dispRect.x=TC_MULTIPLE_UL_X;
+		dispRect.y=TC_MULTIPLE_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		&dispRect
+		);
+
+
+
+
 	   //default button
 	   // clipRect.x = TOFF_CANCEL_X;
 	   // clipRect.y = TOFF_CANCEL_Y;
@@ -2929,7 +3001,7 @@ bool checkButtonColl(int x,int y){
 		
 		int i,col,row;
 		col=0;row=0;
-		for(i=0;i<project[nb_edit_slot].timecode;i++){
+		for(i=0;i<timecode;i++){
 			
 			
 			
@@ -2966,6 +3038,10 @@ bool checkButtonColl(int x,int y){
 		// false
 		);
 
+
+
+
+
 		//we get the click and scale before returning to paste position
 		if(polled.newpress){
 			if( 
@@ -2975,29 +3051,46 @@ bool checkButtonColl(int x,int y){
 				&& polled.y > TC_CANCEL_UL_Y
 			   
 			){
+				project[nb_edit_slot].timecode=timecode;
 				//DEBUG going bac to settings for the mo
 				mode=settings;
 				return;
 			}else
 			if( 
-				polled.x < (TC_DEFAULT_UL_X+BTN_BASE_W)
-				&& polled.x > TC_DEFAULT_UL_X
-				&&	polled.y < (TC_DEFAULT_UL_Y+BTN_BASE_W)
-				&& polled.y > TC_DEFAULT_UL_Y			   
+				polled.x < (TC_MULTIPLE_UL_X+BTN_BASE_W)
+				&& polled.x > TC_MULTIPLE_UL_X
+				&&	polled.y < (TC_MULTIPLE_UL_Y+BTN_BASE_W)
+				&& polled.y > TC_MULTIPLE_UL_Y
+			   
 			){
-				//TODO put back default
+				int i;
+				for( i=cb;i<=ce;i++){
+					project[i].timecode=timecode;
+				}
+				//DEBUG going bac to settings for the mo
+				mode=settings;
+				return;
+			// }else
+			// if( 
+				// polled.x < (TC_DEFAULT_UL_X+BTN_BASE_W)
+				// && polled.x > TC_DEFAULT_UL_X
+				// &&	polled.y < (TC_DEFAULT_UL_Y+BTN_BASE_W)
+				// && polled.y > TC_DEFAULT_UL_Y			   
+			// ){
+				// //TODO put back default
 			}else if(
 				polled.x < (TC_CLICK_UL_X+TC_CLICK_W)
 				&& polled.x > TC_CLICK_UL_X
 			){
-				//TODO compute row and col of the click to set tc
+				//compute row and col of the click to set tc
 				Uint16 tx=polled.x - TC_CLICK_UL_X;
 				Uint16 ty=polled.y - TC_CLICK_UL_Y;
 				Uint16 computedCol= tx / (BTN_BASE_W);
 				Uint16 computedRow= ty / (BTN_BASE_W);
 				Uint16 computedTC=computedCol+computedRow*maxcol;
 				LOGD("computed click TC %d \n",computedTC);
-				project[nb_edit_slot].timecode=computedTC;
+				timecode=computedTC;
+				//project[nb_edit_slot].timecode=computedTC;
 			}
 				
 		}
@@ -3064,6 +3157,9 @@ bool checkButtonColl(int x,int y){
 				yScale=((float)ty)/((float)copy_clip_rect.h);
 				
 				LOGD("zoom factors %f %f \n",xScale,yScale);
+				LOGD("we discard y and set xscale \n");
+				yScale=xScale;
+
 				
 				// LOGD("tx ty before zoom scale %d %d \n" , tx,ty);
 				// xpaste=tx/zoom;
@@ -3237,14 +3333,11 @@ bool checkButtonColl(int x,int y){
 				){
 				//pasting for good
 				LOGD("paste with offset \n");
-				//TODO paste width height for scale
 				rtcopy(renderer,
-						// project[nb_edit_slot].tx,
 						current,
 						copy_src,
 						xpaste,ypaste,
 						xScale,yScale,
-						// NULL
 						&copy_clip_rect
 						);
 				project[nb_edit_slot].dirty=true;
@@ -3274,12 +3367,635 @@ bool checkButtonColl(int x,int y){
 	}
 	
 	
+
+  
+	//state of edit mode
+	int xc,yc; //good candidate to keep last value in case of not newpress?
+	int prevxc,prevyc; //init on new press ?
+	//TO CHECK if a new press is out of canvas, does it draw ?
+	bool incanvas;
+  //bool noPaint;
+	//statefunc for edit ( most complex )
+        bool painting=false;
+
+	  
+	 void initBehind();
+	  
+	void commitBehind(){
+		//we blit current on behind, then clear current and copy behind on it
+		SDL_SetRenderTarget(renderer,pane);
+		SDL_SetTextureAlphaMod(current,255);
+		SDL_RenderCopy(renderer, current, NULL, NULL);
+		
+		clearRenderTargetWithSquareEraser(current);
+		SDL_SetRenderTarget(renderer,current);
+		SDL_RenderCopy(renderer, pane, NULL, NULL);
+		
+		// SDL_SetRenderTarget(renderer,behind);
+		clearRenderTargetWithSquareEraser(pane);
+		
+	}
+	  
+	  
+	// on stylus up
+	void commitAbove(){
+
+		//we blit current on undo buffer to keep it
+		LOGD("filling %d \n",currentUndoBuf);
+		clearRenderTargetWithSquareEraser(undoBuf[currentUndoBuf]);
+		SDL_SetRenderTarget(renderer,undoBuf[currentUndoBuf]);
+		SDL_SetTextureAlphaMod(current,255);
+		SDL_RenderCopy(renderer, current, NULL, NULL);
+
+		
+		currentUndoDepth+=1;
+		if(currentUndoDepth>=undoDepth)currentUndoDepth=undoDepth;
+		LOGD("cur undo depth%d\n",currentUndoDepth);
+		
+		//house keeping undo slots
+		currentUndoBuf+=1;
+		if(currentUndoBuf>=undoDepth)currentUndoBuf=0;
+		LOGD("next undo buf%d\n",currentUndoBuf);
+	
+		
+		// clearRenderTargetWithSquareEraser(current);
+		SDL_SetRenderTarget(renderer,current);
+		SDL_RenderCopy(renderer, pane, NULL, NULL);
+		
+		// SDL_SetRenderTarget(renderer,behind);
+		clearRenderTargetWithSquareEraser(pane);
+		
+		
+		
+		
+	}
+
+	  
+		// TODO clean up and comment the mess
+	void directDraw(input * pol){
+						//decouple event loop from polled, as events in dodonpachi mode 
+				//will be indirect
+						//classical you touch I paint
+				
+				
+
+				//WIP weakness we need to persist painting state from new press to end press
+				// right now after new press consumed in other states, paints a bit on coming back
+							if(pol->newpress){
+								LOGD("win dbg: new press prev xc yc reset\n");
+								//first event for this potential line
+								prevxc=-1;prevyc=-1;
+								//TODO with this fix the draw operation segfaults
+								xc=-1;yc=-1; //otherwise archiving will restore prev xc yc
+								// endless line pb
+								// LOGD("zzn checking buttons\n");
+								//state managment in there, not cool
+								painting=!checkButtonColl(pol->x,pol->y);
+							}
+								//normaly should not take place in certain case, clean up
+							if(pol->pressed && painting){
+							
+								//TODO normally should be done when in canvas
+								//archiving previously polled event
+								prevxc=xc;
+								prevyc=yc;
+						
+								//transfo to canvas coords
+								// if not in canvas coordinate,
+								//do not set dirty flag
+								xc=(pol->x-xorig)/zoom;
+								yc=(pol->y-YORIG)/zoom;
+							
+								incanvas=false; //default
+								if( (xc>=0 && xc<=CVSWDTH)
+									&&
+									(yc>=0 && yc<=CVSHGTH)  ){
+									incanvas=true;
+								}else{
+									LOGD("zzn move or click not in canvas \n");
+	
+									//restoring backup not to let negative values here
+									xc=prevxc;
+									yc=prevyc;
+								}
+							
+								//to begin interpolate only with draw that begins in canvas?
+								if(incanvas){
+									//dirty flag for save
+									if( project[nb_edit_slot].dirty==false){
+										project[nb_edit_slot].dirty=true;
+										LOGD(" frame %d dirty from paint \n ",nb_edit_slot);
+									}
+									
+									
+									
+									paintHandlingUI(
+										prevxc,
+										prevyc,
+										xc 
+										, yc,renderer);
+									rendergpupoc(renderer,
+									true,false);
+								}
+							}
+
+							if(pol->endofpress && painting){
+							  painting=false;
+							  if(activeBrush==roundEraser){
+								 LOGD("zzn clearing white from round eraser \n ");
+								 clearCurrentOfClearColorFullAlphaPixels();
+							  }
+							  
+							  if(BEHIND){
+								  //we need to merge behind with current canvas when painting brush up
+								  //lets blit current on behind and make it current
+								  //TODO
+								  commitBehind();
+								  
+								  //then reinit behind (clean or reallocation)
+								  // initBehind();
+							  }else{
+								  
+								  commitAbove();
+								  
+							  }
+							}
+
+	}
+
+
+//dodonpaint variables	
+	bool dodonpaint=false;
+	bool ddpendown=true;
+	bool ddpenjustdownmsg=false;
+	//ddp mode variables
+	Uint16 xcursor,ycursor,prevxtouch,prevytouch;
+	Sint16 deltax,deltay;
+	Uint16 xtouch,ytouch;
+
+	//TODO simplify, use only variables for that mode (stop sharing with direct draw)
+//TODO reset point of origin if finger outside of canvas / button coll, as it kills navigation of cursor it seems
+	void dodonpachiDraw(input * pol){
+				//decouple event loop from polled, as events in dodonpachi mode 
+				//will be indirect
+
+						prevxtouch=xtouch;
+						prevytouch=ytouch;
+						
+						xtouch=pol->x;
+						ytouch=pol->y;
+			
+						//we calculate a delta to move the cursor pos
+						deltax=xtouch-prevxtouch;
+						deltay=ytouch-prevytouch;
+
+						if(pol->newpress){
+							//means we reset our handle
+							deltax=0;
+							deltay=0;
+						}
+						
+						xcursor+=deltax;
+						ycursor+=deltay;
+				//WIP weakness we need to persist painting state from new press to end press
+				// right now after new press consumed in other states, paints a bit on coming back
+							if(pol->newpress){
+								if(checkButtonColl(xtouch,ytouch)){
+									LOGD("dodon button coll, return \n");
+									return;
+								}
+							}
+								//normaly should not take place in certain case, clean up
+							if(pol->pressed && ddpendown){
+							
+								//TODO normally should be done when in canvas
+								//archiving previously polled event
+								prevxc=xc;
+								prevyc=yc;
+						
+						
+								//transfo to canvas coords
+								// if not in canvas coordinate,
+								//do not set dirty flag
+								xc=(xcursor-xorig)/zoom;
+								yc=(ycursor-YORIG)/zoom;
+							
+								incanvas=false; //default
+								if( (xc>=0 && xc<=CVSWDTH)
+									&&
+									(yc>=0 && yc<=CVSHGTH)  ){
+									incanvas=true;
+								}else{
+									LOGD("zzn move or click not in canvas \n");
+	
+									//restoring backup not to let negative values here
+									xc=prevxc;
+									yc=prevyc;
+								}
+							
+								//to begin interpolate only with draw that begins in canvas?
+								if(incanvas){
+									//dirty flag for save
+									if( project[nb_edit_slot].dirty==false){
+										project[nb_edit_slot].dirty=true;
+										LOGD(" frame %d dirty from paint \n ",nb_edit_slot);
+									}
+									
+									
+									if(ddpenjustdownmsg){
+										//first draw not a line, to avoid drawing from last pen up
+										prevxc=xc;
+										prevyc=yc;
+										ddpenjustdownmsg=false; //msg consumed
+									}
+									
+									paintHandlingUI(
+										prevxc,
+										prevyc,
+										xc 
+										, yc,renderer);
+									rendergpupoc(renderer,
+									true,dodonpaint);
+								}
+							}
+
+							if(pol->endofpress && ddpendown){
+							  if(activeBrush==roundEraser){
+								 LOGD("zzn clearing white from round eraser \n ");
+								 clearCurrentOfClearColorFullAlphaPixels();
+								 ddpendown=false;
+							  }
+							}
+	}
+
+	
+  void initedit(){
+	//direct draw setup
+	painting=false;
+	  
+		//for dodonpaint
+		ddpendown=false;
+	  prevxtouch=128*zoom+XORIG;
+	  prevytouch=128*zoom+YORIG;
+	  xtouch=128*zoom+XORIG;
+	  ytouch=128*zoom+YORIG;
+	  
+	  xcursor=128;
+	  ycursor=128;
+
+
+
+      mode=edit;
+
+	  }
+	
+	
+Uint16 copy_frame_nb=-1;
+	
+	
+void toNextFrame(){
+		
+		resetUndo();
+		
+		int tgt = nb_edit_slot+1;
+		//we cycle to first frame
+		if( 
+			tgt>(MAX_FRAME_NMBER-1)	||	project[tgt].tx==NULL
+		){ 
+			LOGD("we cycle to first frame %d\n",tgt);
+			tgt=0;
+		}
+			
+		setEditSlot(tgt);
+		nb_edit_slot=tgt;
+
+}
+
+
+void toPreviousFrame(){
+		
+		resetUndo();
+		
+		//changing behavior , <0, we get to last
+		
+		int tgt = nb_edit_slot-1;
+		if(tgt<0){ 
+			LOGD("zzn move to last frame %d\n",tgt);
+			
+			tgt=frameNumber()-1;
+		}
+		setEditSlot(tgt);
+		nb_edit_slot=tgt;
+
+	
+}
+
+
+void resetUndo(){
+	currentUndoBuf=0;
+	currentUndoDepth=0;
+	
+}
+
+//undo
+void unstackundo(){
+	if(currentUndoDepth>0){
+		LOGD("unstacking \n");
+		currentUndoDepth-=1;
+		LOGD("new undo depth %d \n",currentUndoDepth);
+		currentUndoBuf-=1;
+		if(currentUndoBuf<0)currentUndoBuf=undoDepth-1;
+		
+		LOGD("restoring slot %d \n",currentUndoBuf);
+		SDL_Texture * tmp= undoBuf[currentUndoBuf];
+		undoBuf[currentUndoBuf]=project[nb_edit_slot].tx;
+		project[nb_edit_slot].tx=tmp;
+		current=tmp;
+		LOGD("undo done\n");
+		
+	}
+	
+}
+	
+//returns true if click consumed ( no paint )
+bool checkButtonColl(int x,int y){
+	LOGD("zzn checking buttons\n");
+	if( 
+		x < (BTN_SETTINGS_UL_X+BTN_BASE_W)
+		&& x > BTN_SETTINGS_UL_X
+		&&	y < (BTN_SETTINGS_UL_Y+BTN_BASE_W)
+		&& y > BTN_SETTINGS_UL_Y
+	){
+		LOGD("zzn settings screen \n");
+		mode=settings;
+		return true;
+	}else if( 
+		x < (BTN_ADD_UL_X+BTN_BASE_W)
+		&& x > BTN_ADD_UL_X
+		&&	y < (BTN_ADD_UL_Y+BTN_BASE_W)
+		&& y > BTN_ADD_UL_Y
+	){
+		LOGD("zzn btn add \n");
+		appendframe(nb_edit_slot+1);
+		return true;
+	}else if( 
+		x < (BTN_FLR_UL_X+BTN_BASE_W)
+		&& x > BTN_FLR_UL_X
+		&&	y < (BTN_FLR_UL_Y+BTN_BASE_W)
+		&& y > BTN_FLR_UL_Y
+	){
+		resetUndo();
+		initFlick(false);
+		return true;
+	}else if( 
+		x < (BTN_FLG_UL_X+BTN_BASE_W)
+		&& x > BTN_FLG_UL_X
+		&&	y < (BTN_FLG_UL_Y+BTN_BASE_W)
+		&& y > BTN_FLG_UL_Y
+	){
+	
+		initFlick(true);
+		return true;
+	}else if( 
+		x < (BTN_PLAY_UL_X+BTN_BASE_W)
+		&& x > BTN_PLAY_UL_X
+		&&	y < (BTN_PLAY_UL_Y+BTN_BASE_W)
+		&& y > BTN_PLAY_UL_Y
+	){
+		LOGD("fill button pressed going to pick screen \n");
+		fillmode=true;
+		paletteMode=false;
+		cleanColor=false;
+		mode=pickMode;
+		return true;
+	
+		// init_play();
+		// return true;
+	}else if( 
+		x < (BTN_COPY_UL_X+BTN_BASE_W)
+		&& x > BTN_COPY_UL_X
+		&&	y < (BTN_COPY_UL_Y+BTN_BASE_W)
+		&& y > BTN_COPY_UL_Y
+	){
+		// //HACK to test
+		ddpendown=!ddpendown;
+		ddpenjustdownmsg=ddpendown;		
+						
+		//to not have ghost lines 
+		LOGD("ddpendown %d \n",ddpendown);
+		
+		
+	
+		//set copy slot
+		copy_frame_nb=nb_edit_slot;
+		copy_src=project[nb_edit_slot].tx;
+		LOGD("copy slot set to : %d %d \n",copy_frame_nb,copy_src);
+		return true;
+	}else if( 
+		x < (BTN_UNDO_UL_X+BTN_BASE_W)
+		&& x > BTN_UNDO_UL_X
+		&&	y < (BTN_UNDO_UL_Y+BTN_BASE_W)
+		&& y > BTN_UNDO_UL_Y
+	){
+		unstackundo();
+		return true;
+	}else if( 
+		x < (BTN_PASTE_UL_X+BTN_BASE_W)
+		&& x > BTN_PASTE_UL_X
+		&&	y < (BTN_PASTE_UL_Y+BTN_BASE_W)
+		&& y > BTN_PASTE_UL_Y
+	){
+		if(copy_src!=NULL){
+			if(BEHIND){
+				LOGD("pasting behind \n");
+				clearRenderTargetWithSquareEraser(pane);
+				rtcopy(renderer,
+						// project[nb_edit_slot].tx,
+						pane,
+						copy_src,
+						0,0,0,0,NULL);
+				rtcopy(renderer,
+						// project[nb_edit_slot].tx,
+						pane,
+						current,
+						0,0,0,0,NULL);
+				//now we need to swap
+				clearRenderTargetWithSquareEraser(current);
+				rtcopy(renderer,
+						// project[nb_edit_slot].tx,
+						current,
+						pane,
+						0,0,0,0,NULL);
+				clearRenderTargetWithSquareEraser(pane);
+				
+						
+				project[nb_edit_slot].dirty=true;
+				LOGD("frame %d marked dirty \n",nb_edit_slot);
+				
+			}else{
+				LOGD("pasting to frame \n");
+				rtcopy(renderer,
+						// project[nb_edit_slot].tx,
+						current,
+						copy_src,
+						0,0,0,0,NULL);
+				project[nb_edit_slot].dirty=true;
+				LOGD("frame %d marked dirty \n",nb_edit_slot);
+			}
+		}else{
+			LOGD(" no copyslot set \n");
+		}
+		return true;
+	}else if( 
+		x < (BTN_NXT_UL_X+BTN_BASE_W)
+		&& x > BTN_NXT_UL_X
+		&&	y < (BTN_NXT_UL_Y+BTN_BASE_W)
+		&& y > BTN_NXT_UL_Y
+	){
+		LOGD("zzn button next\n");
+		
+		toNextFrame();
+		
+		// int tgt = nb_edit_slot+1;
+		// //we cycle to first frame
+		// if( 
+			// tgt>(MAX_FRAME_NMBER-1)	||	project[tgt].tx==NULL
+		// ){ 
+			// LOGD("we cycle to first frame %d\n",tgt);
+			// tgt=0;
+		// }
+			
+		// setEditSlot(tgt);
+		// nb_edit_slot=tgt;
+
+		return true;
+	}else 	if( 
+		x < (BTN_PREV_UL_X+BTN_BASE_W)
+		&& x > BTN_PREV_UL_X
+		&&	y < (BTN_PREV_UL_Y+BTN_BASE_W)
+		&& y > BTN_PREV_UL_Y
+	){
+		LOGD("zzn button back\n");
+		
+
+		toPreviousFrame();
+		// //changing behavior , <0, we get to last
+		
+		// int tgt = nb_edit_slot-1;
+		// if(tgt<0){ 
+			// LOGD("zzn move to last frame %d\n",tgt);
+			
+			// tgt=frameNumber()-1;
+		// }
+		// setEditSlot(tgt);
+		// nb_edit_slot=tgt;
+		return true;
+	}else 	if( 
+		x < (BTN_SAVE_UL_X+BTN_BASE_W)
+		&& x > BTN_SAVE_UL_X
+		&&	y < (BTN_SAVE_UL_Y+BTN_BASE_W)
+		&& y > BTN_SAVE_UL_Y
+	){
+		LOGD("zzn save clicked\n");
+		saveProjectFrames();
+		LOGD("zzn returned from frames save \n");
+		return true;
+	}else 	if( 
+		x < (BTN_ERASER_UL_X+BTN_BASE_W)
+		&& x > BTN_ERASER_UL_X
+		&&	y < (BTN_ERASER_UL_Y+BTN_BASE_W)
+		&& y > BTN_ERASER_UL_Y
+	){
+		LOGD("zzn toggle erase clicked\n");
+		
+		//testClearRT(renderer,project[nb_edit_slot].tx);
+		toggleEraser();
+		return true;
+	}
+		
+	
+	
+	
+	return false;
+}
+
+
+	void kshortcuts(input * keys){
+		if(keys->kleft){
+			LOGD("kshort left \n");
+			toNextFrame();
+		}else if(keys->kright){
+			LOGD("kshort right\n");
+			toPreviousFrame();
+		}
+	}
+
+	void edit( ){
+				//first so that we get a render before blocking for input
+				rendergpupoc(renderer
+				,true,dodonpaint);
+	
+	
+				handleinput(&polled,
+				true //has been blocking for most of the dev
+				//false
+				);
+				
+				kshortcuts(&polled);
+				
+				if(dodonpaint){
+					dodonpachiDraw(&polled);
+				}else{
+					 directDraw(&polled);
+				}
+				
+	}
+
+	
+	//we pass buttons as parameter,
+	//as on gles target rt change clears screen
+	void rendergpupoc(SDL_Renderer * renderer,
+		bool buttons,bool renderCursor){
+		SDL_SetRenderTarget(renderer,NULL);
+
+		lightTableDrawCalls();
+		
+		
+		if(buttons)renderbuttons();
+		
+		if(renderCursor){
+				   SDL_Rect destRect = 
+				   {
+				   //code duplication from paint
+				   xcursor - brushScale/2,
+				   ycursor- brushScale/2,
+				   // 2*brushRadius,
+				   // 2*brushRadius
+					//WIP
+				   brushScale,
+				   brushScale
+				   }; //TODO needs to be computed from radius
+				   SDL_RenderCopy(renderer, activeBrush, NULL, &destRect);
+
+			
+		}
+		
+		
+		SDL_RenderPresent(renderer);
+
+		//debug for note 3 neo flicker
+		//LOGD("zzn render gpu poc\n");
+
+	}
+
+	
+	
 	//**********  SETTINGS PANE   *********************
 	
 	Uint16 brushDispY=0;
-
-	Uint16 cb=0;
-	Uint16 ce=0;
+//moved up for proto
+//	Uint16 cb=0;
+//	Uint16 ce=0;
 	
 	void render_settings(){
 		SDL_SetRenderTarget(renderer,NULL);
@@ -3356,8 +4072,10 @@ bool checkButtonColl(int x,int y){
 		
 		
 		
-		clipRect.x=TOFF_FILL_X;
-		clipRect.y=TOFF_FILL_Y;
+		clipRect.x=TOFF_PLAY_X;
+		clipRect.y=TOFF_PLAY_Y;
+		// clipRect.x=TOFF_FILL_X;
+		// clipRect.y=TOFF_FILL_Y;
 		clipRect.w=64;
 		clipRect.h=64;
 		
@@ -3389,7 +4107,22 @@ bool checkButtonColl(int x,int y){
 		SDL_RenderCopy(renderer,
 		buttons, 
 		&clipRect,
-		// NULL,
+		&dispRect
+		);
+
+		clipRect.x=TOFF_PASTEBIT_X;
+		clipRect.y=TOFF_PASTEBIT_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		dispRect.x=BTN_PASTEBIT_UL_X;
+		dispRect.y=BTN_PASTEBIT_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
 		&dispRect
 		);
 
@@ -3464,13 +4197,99 @@ bool checkButtonColl(int x,int y){
 		&dispRect
 		);
 
+		//palette
+		clipRect.x=TOFF_PALETTE_X;
+		clipRect.y=TOFF_PALETTE_Y;
+		clipRect.w=64;
+		clipRect.h=64;
 		
+		dispRect.x=BTN_PALETTE_UL_X;
+		dispRect.y=BTN_PALETTE_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		// NULL,
+		&dispRect
+		);
+		
+		//del color
+		clipRect.x=TOFF_DELETECOLOR_X;
+		clipRect.y=TOFF_DELETECOLOR_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		dispRect.x=BTN_DELETECOLOR_UL_X;
+		dispRect.y=BTN_DELETECOLOR_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		// NULL,
+		&dispRect
+		);
+		
+		//ddp
+		clipRect.x=TOFF_DDP_X;
+		clipRect.y=TOFF_DDP_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		dispRect.x=BTN_DDP_UL_X;
+		dispRect.y=BTN_DDP_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		// NULL,
+		&dispRect
+		);
+		//MOV WAV
+		clipRect.x=TOFF_MOVEWAV_X;
+		clipRect.y=TOFF_MOVEWAV_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		dispRect.x=BTN_MOVEWAV_UL_X;
+		dispRect.y=BTN_MOVEWAV_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		// NULL,
+		&dispRect
+		);
+		//clear artifact
+		clipRect.x=TOFF_CLEAR_ARTIFACTS_X;
+		clipRect.y=TOFF_CLEAR_ARTIFACTS_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		dispRect.x=BTN_CLEAR_ARTIFACTS_UL_X;
+		dispRect.y=BTN_CLEAR_ARTIFACTS_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		// NULL,
+		&dispRect
+		);
 		//render current brush
 		
 		dispRect.x=BTN_BASE_W;
-		dispRect.y=SCRHGTH-brushScale*zoom;
-		dispRect.w=brushScale*zoom;
-		dispRect.h=brushScale*zoom;
+		dispRect.y=SCRHGTH-(Uint16)brushScale*zoom;
+		dispRect.w=(Uint16)brushScale*zoom;
+		dispRect.h=(Uint16)brushScale*zoom;
 
 						   
 
@@ -3491,6 +4310,73 @@ bool checkButtonColl(int x,int y){
 		SDL_RenderPresent(renderer);
 
 	}
+
+
+	// only move info in memory, the wav is renamed on project save
+	void logicalmovewav(){
+		// 
+		if (copy_frame_nb<0){
+			LOGD("no copy frame \n");
+			return;
+		}
+
+		if(project[copy_frame_nb].snd==NULL){
+			LOGD(" no sound to copy \n");
+			return;
+		}
+
+		if(copy_frame_nb>nb_edit_slot){
+			LOGD("with save order not sure that making frame earlier in time is 100p100 \n");
+			return;
+		}
+
+		project[nb_edit_slot].snd=project[copy_frame_nb].snd;
+		project[nb_edit_slot].wavFileNumberOnDisk=project[copy_frame_nb].wavFileNumberOnDisk;
+		project[copy_frame_nb].wavFileNumberOnDisk=0;
+		project[copy_frame_nb].snd=NULL;
+		LOGD("successful logical copy of slot %d to %d \n",copy_frame_nb,nb_edit_slot);
+		
+	}
+
+	
+	
+	void clearCurrentOfSinglePixels(){
+				copyTexToBufferSurf(nb_edit_slot);
+				 
+				// char debugsave[512];
+				// strcpy(debugsave,projectPath);
+				// strcat(debugsave,"beforeclean.bmp");
+				// LOGD("%s \n",debugsave);
+				
+				// SDL_SaveBMP(bufferSurf,debugsave);
+
+				myRgba replaceCol;
+				replaceCol.r=clearR;
+				replaceCol.g=clearG;
+				replaceCol.b=clearB;
+				replaceCol.a=0;
+				
+				
+				noRecCleanArtifacts((Uint8 *)bufferSurf->pixels,replaceCol);				
+				
+				// strcpy(debugsave,projectPath);
+				// strcat(debugsave,"afterclean.bmp");
+				// LOGD("%s \n",debugsave);
+				// SDL_SaveBMP(bufferSurf,debugsave);
+				// // SDL_SaveBMP(bufferSurf,"afterclean.bmp");
+				
+				clearRenderTargetWithSquareEraser(project[nb_edit_slot].tx);
+				loadsurftostreamingtex(bufferSurf,tmp,true,255);
+				blittexoncleanrt(renderer,project[nb_edit_slot].tx,tmp);		
+				project[nb_edit_slot].dirty=true;
+				
+				//WORKAROUND it seems there are clear color pixels with full alpha
+				//we run it as a workaround
+				clearCurrentOfClearColorFullAlphaPixels();
+		
+		
+	}
+	
 	
 	//statefunc for settings > sliders
 	
@@ -3556,8 +4442,105 @@ bool checkButtonColl(int x,int y){
 				&& polled.y > BTN_FILL_UL_Y
 			   
 			){
-				LOGD("fill button pressed going to pick screen \n",nb_edit_slot);
-				fillmode=true;
+				// LOGD("fill button pressed going to pick screen \n");
+				// fillmode=true;
+				// paletteMode=false;
+					// mode=pickMode;
+					// return;
+				resetUndo();
+				init_play();
+				return ;
+				
+			}else
+			if( 
+				polled.x < (BTN_DDP_UL_X+BTN_BASE_W)
+				&& polled.x > BTN_DDP_UL_X
+				&&	polled.y < (BTN_DDP_UL_Y+BTN_BASE_W)
+				&& polled.y > BTN_DDP_UL_Y
+			   
+			){
+				dodonpaint=!dodonpaint;
+				LOGD("dodon paint %d\n",dodonpaint);
+				initedit();
+				return;
+			}else
+			if( 
+				polled.x < (BTN_PASTEBIT_UL_X+BTN_BASE_W)
+				&& polled.x > BTN_PASTEBIT_UL_X
+				&&	polled.y < (BTN_PASTEBIT_UL_Y+BTN_BASE_W)
+				&& polled.y > BTN_PASTEBIT_UL_Y
+			   
+			){
+				LOGD("pastebit  \n");
+				rtcopy(renderer,
+						current,
+						copy_src,
+						copy_clip_rect.x,copy_clip_rect.y,
+						1,1,
+						&copy_clip_rect
+						);
+				project[nb_edit_slot].dirty=true;
+				
+				
+				initedit();
+				return;
+			}else
+			if( 
+				polled.x < (BTN_CLEAR_ARTIFACTS_UL_X+BTN_BASE_W)
+				&& polled.x > BTN_CLEAR_ARTIFACTS_UL_X
+				&&	polled.y < (BTN_CLEAR_ARTIFACTS_UL_Y+BTN_BASE_W)
+				&& polled.y > BTN_CLEAR_ARTIFACTS_UL_Y
+			   
+			){
+				LOGD("clear artifacts  \n");
+				//WIP insert call with correct color and eraser check
+				myRgba param;
+				param.r=clearR;
+				param.g=clearG;
+				param.b=clearB;
+//WIP dl of the texture needs to be made
+//				noRecClearArtifacts();
+				clearCurrentOfSinglePixels();
+				project[nb_edit_slot].dirty=true;
+				initedit();
+				return;
+			}else
+			if( 
+				polled.x < (BTN_MOVEWAV_UL_X+BTN_BASE_W)
+				&& polled.x > BTN_MOVEWAV_UL_X
+				&&	polled.y < (BTN_MOVEWAV_UL_Y+BTN_BASE_W)
+				&& polled.y > BTN_MOVEWAV_UL_Y
+			   
+			){
+				LOGD("MOVE WAV \n");
+				logicalmovewav();
+				return;
+			}else
+			if( 
+				polled.x < (BTN_PALETTE_UL_X+BTN_BASE_W)
+				&& polled.x > BTN_PALETTE_UL_X
+				&&	polled.y < (BTN_PALETTE_UL_Y+BTN_BASE_W)
+				&& polled.y > BTN_PALETTE_UL_Y
+			   
+			){
+				LOGD("palette button pressed going to palette screen \n");
+				fillmode=false;
+				cleanColor=false;
+				paletteMode=true;
+					mode=pickMode;
+					return;
+			}else
+			if( 
+				polled.x < (BTN_DELETECOLOR_UL_X+BTN_BASE_W)
+				&& polled.x > BTN_DELETECOLOR_UL_X
+				&&	polled.y < (BTN_DELETECOLOR_UL_Y+BTN_BASE_W)
+				&& polled.y > BTN_DELETECOLOR_UL_Y
+			   
+			){
+				LOGD("del color button pressed going to pick screen \n");
+				fillmode=false;
+				paletteMode=false;
+				cleanColor=true;
 					mode=pickMode;
 					return;
 				
@@ -3570,6 +4553,7 @@ bool checkButtonColl(int x,int y){
 			   
 			){
 				LOGD("tcode button pressed going to tcode screen \n",nb_edit_slot);
+					initTimeCodeMode();
 					mode=timeCodeMode;
 					return;
 				
@@ -3611,6 +4595,8 @@ bool checkButtonColl(int x,int y){
 			){
 					LOGD("color picker pressed\n");
 					fillmode=false;
+					cleanColor=false;
+					paletteMode=false;
 					mode=pickMode;
 					return;
 			}else
@@ -3717,106 +4703,107 @@ bool checkButtonColl(int x,int y){
 	
 	
 //#######	END SETTINGS SCREEN
-	//state of edit mode
-	int xc,yc; //good candidate to keep last value in case of not newpress?
-	int prevxc,prevyc; //init on new press ?
-	//TO CHECK if a new press is out of canvas, does it draw ?
-	bool incanvas;
-  //bool noPaint;
-	//statefunc for edit ( most complex )
-        bool painting=false;
-
-  void initedit(){
-    painting=false;
-      mode=edit;
-
-  }
-  
-	void edit( ){
-				//first so that we get a render before blocking for input
-				rendergpupoc(renderer
-				,true);
 	
 	
-				handleinput(&polled,
-				true //has been blocking for most of the dev
-				//false
+
+	void readTranspColor(){
+	char path[256];
+
+	strcpy(path,projectPath);
+
+		
+		char transpColorFile[512];
+		strcpy(transpColorFile,projectPath);
+		strcat(transpColorFile,"transpColor.txt");
+		LOGD("zzn looking for transp file: %s \n",transpColorFile);
+		ifstream myFile (
+				transpColorFile
 				);
-
-
-				//WIP weakness we need to persist painting state from new press to end press
-				// right now after new press consumed in other states, paints a bit on coming back
-							if(polled.newpress){
-								LOGD("win dbg: new press prev xc yc reset\n");
-								//first event for this potential line
-								prevxc=-1;prevyc=-1;
-								//TODO with this fix the draw operation segfaults
-								xc=-1;yc=-1; //otherwise archiving will restore prev xc yc
-								// endless line pb
-								LOGD("zzn checking buttons\n");
-								//state managment in there, not cool
-								painting=!checkButtonColl(polled.x,polled.y);
-							}
-								//normaly should not take place in certain case, clean up
-							if(polled.pressed && painting){
-							
-								//TODO normally should be done when in canvas
-								//archiving previously polled event
-								prevxc=xc;
-								prevyc=yc;
-							
-								//transfo to canvas coords
-								// if not in canvas coordinate,
-								//do not set dirty flag
-								xc=(polled.x-xorig)/zoom;
-								yc=(polled.y-YORIG)/zoom;
-							
-								incanvas=false; //default
-								if( (xc>=0 && xc<=CVSWDTH)
-									&&
-									(yc>=0 && yc<=CVSHGTH)  ){
-									incanvas=true;
-								}else{
-									LOGD("zzn move or click not in canvas \n");
-	
-									//restoring backup not to let negative values here
-									xc=prevxc;
-									yc=prevyc;
-								}
-							
-								//to begin interpolate only with draw that begins in canvas?
-								if(incanvas){
-									//dirty flag for save
-									if( project[nb_edit_slot].dirty==false){
-										project[nb_edit_slot].dirty=true;
-										LOGD(" frame %d dirty from paint \n ",nb_edit_slot);
-									}
-									
-									
-									
-									paintHandlingUI(
-										prevxc,
-										prevyc,
-										xc 
-										, yc,renderer);
-									rendergpupoc(renderer,
-									true);
-								}
-							}
-
-							if(polled.endofpress && painting){
-							  painting=false;
-							  if(activeBrush==roundEraser){
-								 LOGD("zzn clearing white from round eraser \n ");
-								 clearCurrentOfClearColorFullAlphaPixels();
-							  }
-							}
-							
+		char charTab[512]; 
+		if (myFile.is_open()){
+			LOGD("zzn transp file open  \n");
+			myFile.getline(charTab,512);
+			char sred[4];
+			sred[0]=charTab[0];
+			sred[1]=charTab[1];
+			sred[2]=charTab[2];
+			sred[3]='\0';
+			//Uint16 ired;
+			sscanf(sred,"%d",&clearR);
 			
-	
-	
+			LOGD("transp col r after load: %d \n",clearR);
+
+			myFile.getline(charTab,512);
+			char sgreen[4];
+			sgreen[0]=charTab[0];
+			sgreen[1]=charTab[1];
+			sgreen[2]=charTab[2];
+			sgreen[3]='\0';
+			// Uint16 igreen;
+			sscanf(sgreen,"%d",&clearG);
+			
+			LOGD("transp col g after load: %d \n",clearG);
+			myFile.getline(charTab,512);
+			char sblue[4];
+			sblue[0]=charTab[0];
+			sblue[1]=charTab[1];
+			sblue[2]=charTab[2];
+			sblue[3]='\0';
+			// Uint16 iblue;
+			sscanf(sblue,"%d",&clearB);
+			
+			LOGD("transp col b after load: %d \n",clearB);
+			//for some reason on android copying red Uint8 in clearR,g ,b didn't work
+			// direct sscsanf works though
+
+			// clearR=ired;
+			// clearG=igreen;
+			// clearB=iblue;
+			// LOGD(" transpColorFile  found,setting clear color %d %d %d \n",clearR,clearG,clearB );
+			
+			
+		}else{
+			LOGD(" transpColorFile not found,setting default clear color \n" );
+			clearR=CL_R;
+			clearG=CL_G;
+			clearB=CL_B;
+			
+		}
+		
 	}
 
+void saveTranspCol(){
+	
+	char path[256];
+	strcpy(path,projectPath);
+	// strcpy(path,"./");
+	// #ifdef __ANDROID_API__
+	// //overriding with android sensible default
+	// strcpy(path, 
+	// SDL_AndroidGetExternalStoragePath()
+	// );
+	// strcat(path,"/");
+	// #endif
+	strcat(path,"transpColor.txt");
+
+	
+	fstream fo(path,ios::out);
+	char frm[4];
+	sprintf(frm,"%03d",clearR);
+	fo<<frm<<endl;
+	sprintf(frm,"%03d",clearG);
+	fo<<frm<<endl;
+	sprintf(frm,"%03d",clearB);
+	fo<<frm<<endl;
+	
+	fo.close();
+	
+	
+}
+	
+	
+	
+	
 	void readProjectPath(){
 		//sensible default, will be read from file 
 		strcpy(projectPath,"./");
@@ -3848,10 +4835,78 @@ bool checkButtonColl(int x,int y){
 		
 	}
 	
+	
+	// not sure necessary
+	
+	//each time we commit behind paint we reinit
+	void initBehind(){
+		// //we use buffer surf and blit tmp on RT as usual
+		// //let s try to reset buffer surf (from one call to the next there seems to be a 'memory')
+		// int i,j;
+		// //CVSWDTH,CVSHGTH
+		// for(j=0;j<CVSHGTH;j++){
+			// for(i=0;i<CVSWDTH;i++){				
+					// //clear color found and alpha not 0
+					// ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+0]=0;
+					// ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+1]=0;
+					// ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+2]=0;
+					// ((Uint8 *)bufferSurf->pixels)[ 4*(CVSWDTH*j+i)+3]=0;
+			// }
+		// }
+		
+		
+		// //for some reason on direct 3D, on second call copy tex only gives non white areas from penultimate frame,
+		// // we hijack save slot as it works fine (BROWN TAPE FIX)
+		// copyTexToBufferSurf(nb_edit_slot);
+		// //saveSlotToBufferSurf(nb_edit_slot);
+		
+		
+		// //WINDOWS DEBUG
+		// LOGD("ctex debug.bmp SAVE");
+		// SDL_SaveBMP(
+				// bufferSurf
+				// ,"debug.bmp");
+		
+		//at this point all white is 255 on windows (patch to copytex buffer surf, and debug save is ok)
+		
+		// removeAllClearColorAlphaInBufferSurf();
+		
+		
+		// loadsurftostreamingtex(
+							// bufferSurf,
+							// tmp,
+							// true,
+							// 255
+			// );
+			
+		clearRenderTargetWithSquareEraser(pane);			
+		// blittexoncleanrt(renderer,project[nb_edit_slot].tx,tmp);		
+		
+	}
+
+
+	void allocateUndoBuf(){
+		
+		for(int i=0;i<undoDepth;i++){
+			undoBuf[i]=createFrameTexture();
+		}
+		
+	}
+	
+
+	void deallocateUndoBuf(){
+		
+		for(int i=0;i<undoDepth;i++){
+			SDL_DestroyTexture(undoBuf[i]);
+		}
+		
+	}
+		
+	
 	//main test
 	void mainloop(){
-		
 		readProjectPath();
+		readTranspColor();
 		
 		//cjson test
 		// char test[256]="{'a':1,'b':2}";
@@ -3876,16 +4931,23 @@ bool checkButtonColl(int x,int y){
 		Uint16 reqscrw=0;
 		Uint16 reqscrh=0;
 		//this is how we detect windows
+
+		#ifdef __ANDROID_API__
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengles2");
+		#endif
+		
 		#ifndef __ANDROID_API__
 		reqscrw=
 		// SCRWDTH
-		852
+		//852
+		1300
 		;
 		reqscrh=
+		700
 		// SCRHGTH
-		480
+		//480
 		;
-
+		SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
 		#endif
 		
 		SDL_CreateWindowAndRenderer(
@@ -3949,10 +5011,13 @@ bool checkButtonColl(int x,int y){
 					 "template.bmp"
 		);
 				
+				
+				
 		//will be refac to use buff
 		loadprojectsurfs();
 		loadTimeCodes(projectPath,project);
-	
+		allocateUndoBuf();
+		
 		setEditSlot(nb_edit_slot);
 
 		
@@ -3973,22 +5038,29 @@ bool checkButtonColl(int x,int y){
 		buttons  = SDL_CreateTextureFromSurface(renderer, buttonsSurf);
 		SDL_FreeSurface( buttonsSurf);
 		
-		
-		//end canvas clear
-		//for test without doing anything
-		// paintCanvas
-		// (0,0,renderer,
-		// current,
-		// brush);
 
-		//DBG unit test of copy
-		// rtcopy(renderer,project[0].tx,project[1].tx);
-		//works, now need buttons
+
+		//TO REFAC setup for paint behind mode
+        pane=SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET,
+												CVSWDTH,CVSHGTH);
+		SDL_SetTextureBlendMode(pane,SDL_BLENDMODE_BLEND);
+		initBehind();
+		
+		
+
+
+		paletteSurface=SDL_LoadBMP("palette.bmp");		
+		palette = SDL_CreateTexture( renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING,
+		CVSWDTH,CVSHGTH
+		);
+		loadsurftostreamingtex(paletteSurface,palette,false,255);
+
+
 		
 		//not pushing it in render gpu poc ( perf ? ) NOT WORKING RIGHT NOW
 		//in case set render target clears ops?
 		rendergpupoc(renderer,
-		true);
+		true,false);
 		
 		polled.quit=false;//toget in the while
 		polled.pressed=false;//init 
@@ -4035,10 +5107,17 @@ bool checkButtonColl(int x,int y){
 		
 		//the loading "buffer"
 		SDL_DestroyTexture(tmp);
+
+		SDL_DestroyTexture(palette);
+		
+		SDL_DestroyTexture(pane);
+		
+		deallocateUndoBuf();
 		
 		//load/ save buffer
 		SDL_FreeSurface(bufferSurf);
 		
+		SDL_FreeSurface(paletteSurface);
 		
 		//for sound test
 

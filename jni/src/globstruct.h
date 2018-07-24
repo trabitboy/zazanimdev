@@ -43,7 +43,7 @@
 
 #define ALPHA_BORDER 1
 
-//#define GLOBAL_ALPHA 128
+// #define GLOBAL_ALPHA 128
  #define GLOBAL_ALPHA 255
 
 // #define CL_R 0X00
