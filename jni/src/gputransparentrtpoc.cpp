@@ -1,3 +1,44 @@
+//to ease synchro of sound :
+//WIP when playing back, display timecodes in ULC , with red ones for "elapsed"
+//	display timecodes on playback
+//  display elapsed as red
+
+
+//WIP highjack gl es or gl on desktop 
+// move test to other file that can be triggered from main
+// try to create gles context like love 11
+// if successful ditch desktop gl if poc of multi texture shader works
+// poc to be done even before highjacking sdl render :
+// 	write shader that accesses two textures and creates a render based on pixels of both 
+// ( search shader toy )
+// just a smoothing shader to wow people on the whole display would be cool for demo
+// ( could be used on render target for a smooth save, or software emulated )
+
+// steps:
+// keep info without alpha in surfs/ tex
+// select an ink color
+// this ink color could be antialiased with the rest on texport 
+// also on display with generated preview artifact / shader
+
+// TODO test blend modes in simpler side poc
+
+// TODO : time the download/ upload of data
+//TODO button to save content of tex to file 
+// (refac slightly text to buffer using rt)
+
+
+//alternative hackish antialias : 
+// paint on pane,
+// paint on hidden pane with a brush that has a clear color outline
+// when committing, track the clear color
+// when found , compute rgba value of real target using lookup of said pixels in an untouched buffer
+// ( before blit )
+// overhead should be same as clear color clean up ( which is not noticeable ? )
+
+//offset of paint areas
+//zoom of paint area
+//probably necessary to reset 
+
 //WIP 
 // behind renamed to pane
 // unify paint to always paint on pane
@@ -219,6 +260,12 @@
 #include "floodfill.h"
 #include "cleanartifacts.h"
 
+
+#ifndef __ANDROID_API__
+#include <SDL_opengl.h>
+#include <SDL_opengl_glext.h>
+#endif
+
 #ifdef __ANDROID_API__
 #include "../SDL/include/SDL_opengles2.h"
 #endif
@@ -278,6 +325,9 @@ using namespace std;
 // ( it probably was due to a local buffer alloc in save / push streaming tex, could be avoided now )
 
 namespace gputransparentrtpoc{
+
+
+
 
 	//proto
 	void resetUndo();
@@ -395,6 +445,258 @@ namespace gputransparentrtpoc{
 
 	Sint16 nb_edit_slot=1; //sensible dflt
 
+	
+	
+	//###BEGIN SHADER POC
+	
+	PFNGLCREATESHADERPROC glCreateShader;
+PFNGLSHADERSOURCEPROC glShaderSource;
+PFNGLCOMPILESHADERPROC glCompileShader;
+PFNGLGETSHADERIVPROC glGetShaderiv;
+PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+PFNGLDELETESHADERPROC glDeleteShader;
+PFNGLATTACHSHADERPROC glAttachShader;
+PFNGLCREATEPROGRAMPROC glCreateProgram;
+PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLVALIDATEPROGRAMPROC glValidateProgram;
+PFNGLGETPROGRAMIVPROC glGetProgramiv;
+PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+PFNGLUSEPROGRAMPROC glUseProgram;
+PFNGLGENBUFFERSPROC glGenBuffers;
+PFNGLBINDBUFFERPROC glBindBuffer;
+PFNGLBUFFERDATAPROC glBufferData;
+
+
+
+bool initGLExtensions() {
+	glCreateShader = (PFNGLCREATESHADERPROC)SDL_GL_GetProcAddress("glCreateShader");
+	glShaderSource = (PFNGLSHADERSOURCEPROC)SDL_GL_GetProcAddress("glShaderSource");
+	glCompileShader = (PFNGLCOMPILESHADERPROC)SDL_GL_GetProcAddress("glCompileShader");
+	glGetShaderiv = (PFNGLGETSHADERIVPROC)SDL_GL_GetProcAddress("glGetShaderiv");
+	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)SDL_GL_GetProcAddress("glGetShaderInfoLog");
+	glDeleteShader = (PFNGLDELETESHADERPROC)SDL_GL_GetProcAddress("glDeleteShader");
+	glAttachShader = (PFNGLATTACHSHADERPROC)SDL_GL_GetProcAddress("glAttachShader");
+	glCreateProgram = (PFNGLCREATEPROGRAMPROC)SDL_GL_GetProcAddress("glCreateProgram");
+	glLinkProgram = (PFNGLLINKPROGRAMPROC)SDL_GL_GetProcAddress("glLinkProgram");
+	glValidateProgram = (PFNGLVALIDATEPROGRAMPROC)SDL_GL_GetProcAddress("glValidateProgram");
+	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)SDL_GL_GetProcAddress("glGetProgramiv");
+	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)SDL_GL_GetProcAddress("glGetProgramInfoLog");
+	glUseProgram = (PFNGLUSEPROGRAMPROC)SDL_GL_GetProcAddress("glUseProgram");
+    glGenBuffers= (PFNGLGENBUFFERSPROC)SDL_GL_GetProcAddress("glGenBuffers");
+    glBindBuffer= (PFNGLBINDBUFFERPROC)SDL_GL_GetProcAddress("glBindBuffer");
+    glBufferData= (PFNGLBUFFERDATAPROC)SDL_GL_GetProcAddress("glBufferData");
+
+	
+	return glCreateShader && glShaderSource && glCompileShader && glGetShaderiv && 
+		glGetShaderInfoLog && glDeleteShader && glAttachShader && glCreateProgram &&
+		glLinkProgram && glValidateProgram && glGetProgramiv && glGetProgramInfoLog &&
+		glUseProgram && glGenBuffers && glBindBuffer && glBufferData;
+}
+
+
+GLuint compileShader(const char* source, GLuint shaderType) {
+	std::cout << "Compilando shader:" << std::endl << source << std::endl;
+	// Create ID for shader
+	GLuint result = glCreateShader(shaderType);
+	// Define shader text
+	glShaderSource(result, 1, &source, NULL);
+	// Compile shader
+	glCompileShader(result);
+
+	//Check vertex shader for errors
+	GLint shaderCompiled = GL_FALSE;
+	glGetShaderiv( result, GL_COMPILE_STATUS, &shaderCompiled );
+	if( shaderCompiled != GL_TRUE ) {
+		std::cout << "Error en la compilación: " << result << "!" << std::endl;
+		GLint logLength;
+		glGetShaderiv(result, GL_INFO_LOG_LENGTH, &logLength);
+		if (logLength > 0)
+		{
+			GLchar *log = (GLchar*)malloc(logLength);
+			glGetShaderInfoLog(result, logLength, &logLength, log);
+			std::cout << "Shader compile log:" << log << std::endl;
+			free(log);
+		}
+		glDeleteShader(result);
+		result = 0;
+	} else {
+		std::cout << "Shader compilado correctamente. Id = " << result << std::endl;
+	}
+	return result;
+}
+
+GLuint compileProgram(const char* vtxFile, const char* fragFile) {
+	GLuint programId = 0;
+	GLuint vtxShaderId, fragShaderId;
+
+	programId = glCreateProgram();
+
+	std::ifstream f(vtxFile);
+	std::string source;
+	// ((std::istreambuf_iterator<char>(f)),
+						// std::istreambuf_iterator<char>());
+	vtxShaderId = compileShader(source.c_str(), GL_VERTEX_SHADER);
+	
+	// std::ifstream(fragFile);
+	// source=std::string((std::istreambuf_iterator<char>(f)), 
+						// std::istreambuf_iterator<char>());
+	fragShaderId = compileShader(source.c_str(), GL_FRAGMENT_SHADER);
+
+	if(vtxShaderId && fragShaderId) {
+		// Associate shader with program
+		glAttachShader(programId, vtxShaderId);
+		glAttachShader(programId, fragShaderId);
+		glLinkProgram(programId);
+		glValidateProgram(programId);
+
+		// Check the status of the compile/link
+		GLint logLen;
+		glGetProgramiv(programId, GL_INFO_LOG_LENGTH, &logLen);
+		if(logLen > 0) {
+			char* log = (char*) malloc(logLen * sizeof(char));
+			// Show any errors as appropriate
+			glGetProgramInfoLog(programId, logLen, &logLen, log);
+			std::cout << "Prog Info Log: " << std::endl << log << std::endl;
+			free(log);
+		}
+	}
+	if(vtxShaderId) {
+		glDeleteShader(vtxShaderId);
+	}
+	if(fragShaderId) {
+		glDeleteShader(fragShaderId);
+	}
+	return programId;
+}
+
+struct LVertexPos2D
+{
+    GLfloat x;
+    GLfloat y;
+};
+
+//Quad vertices
+LVertexPos2D gQuadVertices[ 4 ];
+
+//Vertex Indices
+GLuint gIndices[ 4 ];
+
+//Vertex buffer
+GLuint gVertexBuffer = 0;
+
+//Index buffer
+GLuint gIndexBuffer = 0;
+
+void testLinkWin32AndAndroid(){
+	
+    gQuadVertices[ 0 ].x = SCRWDTH * 1.f / 4.f;
+    gQuadVertices[ 0 ].y = SCRHGTH * 1.f / 4.f;
+
+    gQuadVertices[ 1 ].x = SCRWDTH * 3.f / 4.f;
+    gQuadVertices[ 1 ].y = SCRHGTH * 1.f / 4.f;
+
+    gQuadVertices[ 2 ].x = SCRWDTH * 3.f / 4.f;
+    gQuadVertices[ 2 ].y = SCRHGTH * 3.f / 4.f;
+
+    gQuadVertices[ 3 ].x = SCRWDTH * 1.f / 4.f;
+    gQuadVertices[ 3 ].y = SCRHGTH * 3.f / 4.f;
+
+    //Set rendering indices
+    gIndices[ 0 ] = 0;
+    gIndices[ 1 ] = 1;
+    gIndices[ 2 ] = 2;
+    gIndices[ 3 ] = 3;
+
+    //Create VBO TODO add them to function lookup above
+    glGenBuffers( 1, &gVertexBuffer );
+    glBindBuffer( GL_ARRAY_BUFFER, gVertexBuffer );
+    glBufferData( GL_ARRAY_BUFFER, 4 * sizeof(LVertexPos2D), gQuadVertices, GL_STATIC_DRAW );
+
+    //Create IBO
+    glGenBuffers( 1, &gIndexBuffer );
+    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIndexBuffer );
+    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 4 * sizeof(GLuint), gIndices, GL_STATIC_DRAW );
+	
+	
+}
+
+void testLinkModernGLrender(SDL_Window* win)
+{
+    //Clear color buffer
+	//WIP doesnt build on android gles
+    // glClear( GL_COLOR_BUFFER_BIT );
+
+    // //Enable vertex arrays
+    // glEnableClientState( GL_VERTEX_ARRAY );
+
+        // //Set vertex data
+		// glBindBuffer( GL_ARRAY_BUFFER, gVertexBuffer );
+        // glVertexPointer( 2, GL_FLOAT, 0, NULL );
+
+        // //Draw quad using vertex data and index data
+		// glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, gIndexBuffer );
+        // glDrawElements( GL_QUADS, 4, GL_UNSIGNED_INT, NULL );
+
+    // //Disable vertex arrays
+    // glDisableClientState( GL_VERTEX_ARRAY );
+
+    //Update screen
+	SDL_GL_SwapWindow(win);
+    // glutSwapBuffers();
+}
+
+
+
+void presentBackBuffer(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* backBuffer, GLuint programId) {
+	GLint oldProgramId;
+	// Guarrada para obtener el textureid (en driverdata->texture)
+	//Detach the texture
+	SDL_SetRenderTarget(renderer, NULL);
+	SDL_RenderClear(renderer);
+
+	SDL_GL_BindTexture(backBuffer, NULL, NULL);
+	if(programId != 0) {
+		glGetIntegerv(GL_CURRENT_PROGRAM,&oldProgramId);
+		glUseProgram(programId);
+	}
+
+	GLfloat minx, miny, maxx, maxy;
+	GLfloat minu, maxu, minv, maxv;
+
+	// Coordenadas de la ventana donde pintar.
+	minx = 0.0f;
+	miny = 0.0f;
+	maxx = SCRWDTH;
+	maxy = SCRHGTH;
+
+	minu = 0.0f;
+	maxu = 1.0f;
+	minv = 0.0f;
+	maxv = 1.0f;
+
+	// glBegin(GL_TRIANGLE_STRIP);
+		// glTexCoord2f(minu, minv);
+		// glVertex2f(minx, miny);
+		// glTexCoord2f(maxu, minv);
+		// glVertex2f(maxx, miny);
+		// glTexCoord2f(minu, maxv);
+		// glVertex2f(minx, maxy);
+		// glTexCoord2f(maxu, maxv);
+		// glVertex2f(maxx, maxy);
+	// glEnd();
+	SDL_GL_SwapWindow(win);
+
+	if(programId != 0) {
+		glUseProgram(oldProgramId);
+	}
+}
+
+	
+	//###END SHADER POC
+	
+	
+	
+	
 	
 		//curses project frames until a NULL is found
 	int frameNumber(){
@@ -1188,7 +1490,6 @@ void saveFrame(char * path, int idx){
 		// 255
 		;
 		
-		//TODO add multiplicator on load to get both 32 and 24 ( factor 4 or 3 )
 		
 		Uint8 srfGap=0;
 		if(srfBpp==32){
@@ -1224,7 +1525,7 @@ void saveFrame(char * path, int idx){
 			fmt=src->format;
 			SDL_LockSurface(src);
 			//index= surface->pixels[]
-			//WIP
+			//WIP unfinished
 		}
 		
 		//we dont need a
@@ -1545,7 +1846,7 @@ void saveFrame(char * path, int idx){
 		free(readpixels);
 
 		bench=SDL_GetTicks()-bench;
-		LOGD("zzn copy from fb to surf ms %d \n",bench);
+		LOGD("zzn copy from tex to surf ms %d \n",bench);
 	
 		
 	}
@@ -2639,25 +2940,6 @@ void init_play();
   
 	//*******************************
 	
-	//anim play back doesnot onion skin
-	void render_playback(int frame){
-		SDL_SetRenderTarget(renderer,NULL);
-		   SDL_Rect dispRect = 
-			{xorig,YORIG,
-			CVSWDTH*zoom,CVSHGTH*zoom};
-		SDL_SetRenderDrawColor(renderer,
-		// CL_R,CL_G,CL_B,
-		clearR,clearG,clearB,
-		0X00);
-		SDL_RenderClear(renderer);
-		
-		
-		SDL_SetTextureAlphaMod(project[frame].tx,255);
-		SDL_RenderCopy(renderer, project[frame].tx, NULL, &dispRect);
-		
-		
-		SDL_RenderPresent(renderer);
-	}
 	
 	//statefunc for anim play back > stops play back on newpress
 	//TODO maybe optim for battery
@@ -2666,7 +2948,7 @@ void init_play();
 	Uint32 now=0;
 	Uint32 elapsed=0;
 	// Uint16 stopinhib=0;
-
+	Uint16 elapsedTcs=0; // for display purpose
 	
 	void play_anm(){
 		LOGD("play loop\n");
@@ -2680,7 +2962,6 @@ void init_play();
 			);
 
 		// LOGD("play anm\n");
-		render_playback(disp_nb);
 
 		
 		
@@ -2696,6 +2977,10 @@ void init_play();
 					// stopinhib==0;
 				// }
 			// }
+			
+			elapsedTcs =(Uint16) elapsed/frameTime;
+			LOGD( "elapsed tcs %d /n", elapsedTcs );
+			
 			
 			if( elapsed < project[disp_nb].timecode*frameTime){
 				SDL_Delay(frameTime);
@@ -2749,13 +3034,15 @@ void init_play();
 			}
 			
 		 }
-		
+
+		render_playback(disp_nb);
+		 
 	}
 
 	void init_play(){
 		LOGD("initplay negating newpress\n");
 		polled.newpress=false; // so that not immediately consumed a second time
-		last=0;now=0;elapsed=0;
+		last=0;now=0;elapsed=0;elapsedTcs=0;
 		mode = play_anm;
 		frameTime=
 		PB_TIME
@@ -2766,6 +3053,91 @@ void init_play();
 		nb_edit_slot;
 	}
 
+	//anim play back doesnot onion skin
+	void render_playback(int frame){
+		LOGD("rendering frame");
+		
+	   SDL_Rect clipRect = 
+			{
+				0,
+				0,
+				BTN_BASE_W,
+				BTN_BASE_W
+			};
+		
+		
+		SDL_SetRenderTarget(renderer,NULL);
+		   SDL_Rect dispRect = 
+			{xorig,YORIG,
+			CVSWDTH*zoom,CVSHGTH*zoom};
+		SDL_SetRenderDrawColor(renderer,
+		// CL_R,CL_G,CL_B,
+		clearR,clearG,clearB,
+		0X00);
+		SDL_RenderClear(renderer);
+		
+		
+		SDL_SetTextureAlphaMod(project[frame].tx,255);
+		SDL_RenderCopy(renderer, project[frame].tx, NULL, &dispRect);
+
+		// offset=BTN_BASE_W /4;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+		dispRect.x=0;
+		dispRect.y=0;
+		clipRect.x=TOFF_TCODEELAPSED_X;
+		clipRect.y=TOFF_TCODEELAPSED_Y;
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		&dispRect
+		);
+		
+		LOGD(" elapsed tcs %d \n",elapsedTcs);
+		
+		//TODO for some reason doesnt display
+		
+		int i,offset;
+		//adding decorations if time code !=1
+		offset=BTN_BASE_W /4;
+		dispRect.w=offset;
+		dispRect.h=offset;
+		if(project[frame].timecode!=1){
+			for(i=0;i<elapsedTcs;i++){
+				LOGD("display etcs /n");
+				dispRect.x=BTN_BASE_W+i*offset;
+				dispRect.y=0;
+				clipRect.x=TOFF_TCODEELAPSED_X;
+				clipRect.y=TOFF_TCODEELAPSED_Y;
+				SDL_RenderCopy(renderer,
+				buttons, 
+				&clipRect,
+				&dispRect
+				);
+			}
+		}
+			// for(i=elapsedTcs;i<project[nb_edit_slot].timecode;i++){
+				// LOGD("display tcs /n");
+				// dispRect.x=BTN_BASE_W+i*offset;
+				// dispRect.y=0;
+				// clipRect.x=TOFF_TCODE_X;
+				// clipRect.y=TOFF_TCODE_Y;
+				// SDL_RenderCopy(renderer,
+				// buttons, 
+				// &clipRect,
+				// &dispRect
+				// );
+			// }
+		// }
+		
+		
+		
+		SDL_RenderPresent(renderer);
+	}
+	
+	
+	
+	
 	//*** COPY CLIP SELECTION MODE 
 	void pastePosition();
 	
@@ -4968,6 +5340,9 @@ void saveTranspCol(){
 		//480
 		;
 		SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
+		
+		//TEST
+		// SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengles2");		
 		#endif
 		
 		SDL_CreateWindowAndRenderer(
