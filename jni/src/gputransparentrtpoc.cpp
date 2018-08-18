@@ -3061,8 +3061,8 @@ void init_play();
 			{
 				0,
 				0,
-				BTN_BASE_W,
-				BTN_BASE_W
+				64,
+				64
 			};
 		
 		
@@ -3095,31 +3095,63 @@ void init_play();
 		
 		LOGD(" elapsed tcs %d \n",elapsedTcs);
 		
-		//TODO for some reason doesnt display
+		int i,offset,j,maxbyline,linemax,nb;
 		
-		int i,offset;
+		
 		//adding decorations if time code !=1
 		offset=BTN_BASE_W /4;
+		maxbyline=(SCRWDTH-BTN_BASE_W*2)/offset;
+		
+		
 		dispRect.w=offset;
 		dispRect.h=offset;
-		if(project[frame].timecode!=1){
-			for(i=0;i<elapsedTcs;i++){
-				LOGD("display etcs /n");
-				dispRect.x=BTN_BASE_W+i*offset;
-				dispRect.y=0;
-				clipRect.x=TOFF_TCODEELAPSED_X;
-				clipRect.y=TOFF_TCODEELAPSED_Y;
-				SDL_RenderCopy(renderer,
-				buttons, 
-				&clipRect,
-				&dispRect
-				);
+		j=0;
+		if(project[frame].timecode>=1){
+
+			linemax=(Uint8)project[frame].timecode/maxbyline;
+
+			for(j=0;j<=linemax;j++){
+				for(i=0;i<maxbyline;i++){
+					nb=j*maxbyline+i;
+					if( (nb)> project[frame].timecode ){
+						break;
+					}
+					
+					if(nb>elapsedTcs){
+						clipRect.x=TOFF_TCODE_X;
+						clipRect.y=TOFF_TCODE_Y;
+					}else{
+						clipRect.x=TOFF_TCODEELAPSED_X;
+						clipRect.y=TOFF_TCODEELAPSED_Y;
+					}
+					dispRect.x=BTN_BASE_W+i*offset;
+					dispRect.y=j*offset;
+					SDL_RenderCopy(renderer,
+					buttons, 
+					&clipRect,
+					&dispRect
+					);
+					
+					
+				}
 			}
+			
+			// for(i=0;i<elapsedTcs;i++){
+				// dispRect.x=BTN_BASE_W+i*offset;
+				// dispRect.y=j*offset;
+				// clipRect.x=TOFF_TCODEELAPSED_X;
+				// clipRect.y=TOFF_TCODEELAPSED_Y;
+				// SDL_RenderCopy(renderer,
+				// buttons, 
+				// &clipRect,
+				// &dispRect
+				// );
+			// }
 		}
-			// for(i=elapsedTcs;i<project[nb_edit_slot].timecode;i++){
+		// for(i=elapsedTcs;i<project[frame].timecode;i++){
 				// LOGD("display tcs /n");
 				// dispRect.x=BTN_BASE_W+i*offset;
-				// dispRect.y=0;
+				// dispRect.y=j*offset;
 				// clipRect.x=TOFF_TCODE_X;
 				// clipRect.y=TOFF_TCODE_Y;
 				// SDL_RenderCopy(renderer,
@@ -3127,7 +3159,6 @@ void init_play();
 				// &clipRect,
 				// &dispRect
 				// );
-			// }
 		// }
 		
 		
@@ -3372,7 +3403,7 @@ void initTimeCodeMode(){
 		int maxcol;
 		
 		//should be define
-		maxcol=TC_CLICK_W / ( 64 * buttonZoom);
+		maxcol=TC_CLICK_W / ( BTN_BASE_W/2);
 		
 		int i,col,row;
 		col=0;row=0;
@@ -3384,10 +3415,10 @@ void initTimeCodeMode(){
 		   clipRect.y = TOFF_TCODE_Y;
 		   clipRect.w = 64;
 		   clipRect.h = 64;
-			dispRect.x=TC_CLICK_UL_X+buttonZoom*64*col;
-			dispRect.y=TC_CLICK_UL_Y+buttonZoom*64*row;
-			dispRect.w=BTN_BASE_W;
-			dispRect.h=BTN_BASE_W;
+			dispRect.x=TC_CLICK_UL_X+(BTN_BASE_W/2)*col;
+			dispRect.y=TC_CLICK_UL_Y+(BTN_BASE_W/2)*row;
+			dispRect.w=BTN_BASE_W/2;
+			dispRect.h=BTN_BASE_W/2;
 
 			SDL_RenderCopy(renderer,
 			buttons, 
@@ -3460,8 +3491,8 @@ void initTimeCodeMode(){
 				//compute row and col of the click to set tc
 				Uint16 tx=polled.x - TC_CLICK_UL_X;
 				Uint16 ty=polled.y - TC_CLICK_UL_Y;
-				Uint16 computedCol= tx / (BTN_BASE_W);
-				Uint16 computedRow= ty / (BTN_BASE_W);
+				Uint16 computedCol= tx / (BTN_BASE_W/2);
+				Uint16 computedRow= ty / (BTN_BASE_W/2);
 				Uint16 computedTC=computedCol+computedRow*maxcol;
 				LOGD("computed click TC %d \n",computedTC);
 				timecode=computedTC;
