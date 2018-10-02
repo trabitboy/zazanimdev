@@ -78,6 +78,12 @@
 
 #define PB_TIME 150 //andro test
 
+#define DRAG_THRESHOLD 5
+
+#define PINCH_THRESHOLD 5
+
+#define MULTITOUCH_UNDO_THRESHOLD 1000
+
 
 //tex offset
 #define TOFF_NXT_X 0
@@ -91,6 +97,9 @@
 
 #define TOFF_TCODEELAPSED_X 128
 #define TOFF_TCODEELAPSED_Y 64
+
+#define TOFF_ZOOMMODE_X 128
+#define TOFF_ZOOMMODE_Y 0
 
 
 #define TOFF_SAVE_X 0
@@ -286,6 +295,10 @@
 
 //SETTINGS SCREEN
 
+#define BTN_ZOOMMODE_X 4*BTN_BASE_W
+#define BTN_ZOOMMODE_Y SCRHGTH-BTN_BASE_W
+
+
 #define SLDR_BRSH_HGHT SCRHGTH
 #define SLDR_BRSH_WDTH 64*buttonZoom
 
@@ -377,6 +390,11 @@
 #define TC_CLICK_UL_Y 0
 
 #define TC_CLICK_W (SCRWDTH - 128*buttonZoom )
+
+//zoom center mode
+#define ZC_MAX_ZOOM CVSWDTH
+
+#define ZOOM_MAX 4
 
 
 // #define CS_VALIDATE_UL_X (SCRWDTH - 64*buttonZoom )

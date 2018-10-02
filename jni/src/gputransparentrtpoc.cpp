@@ -1,5 +1,36 @@
+//0 time code to ignore draft bg frame
+//background frames with 0 code ( new metadata )
+
+//TODO audit render times using logs ( verify sync )
+
+
+//WIP 2 fingers zoom
+//	decompose
+//		2 fingers set center (without pinch)
+//	 	basic implementation but feeling not wysiwig on windows ?
+//		2 fingers pinch ( to zoom on center )
+//		WIP unstack undo when last paint event less than a second 
+// 		no log for delta time?
+// keep buffer of last n draw events ? so that we can go more than one step back under threshold
+// WIP drag and zoom seem to work on android, but not win32
+// TODO on windows doesnt seem to 
+// use threshold relative to real
+// canvas size
+
+//WIP zoom center screen
+// one button to get there
+// one button to come back
+// a slider on top for zoom
+// just click somewhere to center
+//	 WIP refresh cvs rect from center > TODO refresh not correct, not manageable with huge zoom
+
+// reset button
+// reset zoom and center button
+// start with cut and paste of copy mode
+
+
 //to ease synchro of sound :
-//WIP when playing back, display timecodes in ULC , with red ones for "elapsed"
+//DONE when playing back, display timecodes in ULC , with red ones for "elapsed"
 //	display timecodes on playback
 //  display elapsed as red
 
@@ -330,7 +361,9 @@ namespace gputransparentrtpoc{
 
 
 	//proto
+	void zoom_center();
 	void resetUndo();
+	void unstackundo();
     void initedit();
 	void rendergpupoc(SDL_Renderer * renderer,
 		bool buttons,bool renderCursor);
@@ -344,6 +377,9 @@ namespace gputransparentrtpoc{
 	Uint16 cb=0;
 	Uint16 ce=0;
 
+	
+	//timestamp of the last paint event, to cancel on multitouch
+	Uint32 last_paint_event=0;
 
 	//WIP transparent color is parameterizable now
 	Uint8 clearR=CL_R;
@@ -355,6 +391,7 @@ namespace gputransparentrtpoc{
 	int sw=0;
 	int sh=0;
 	int xorig=0; // init from screen size and zoom
+	int yorig=0; // init from screen size and zoom
 	
 	//brush color, change before realloc
 	myRgb col;
@@ -374,7 +411,12 @@ namespace gputransparentrtpoc{
 	//quick zoom test
 	float zoom=1; //canvas
 	float buttonZoom=1; // preinit for windows?
-
+	
+	
+	//default unzoom settings, for restore
+	float dfltzoom;
+	int dfltxorig,dfltyorig;
+	
 	//flag for BEHIND paint mode
 	bool BEHIND=false;
 	
@@ -695,7 +737,56 @@ void presentBackBuffer(SDL_Renderer *renderer, SDL_Window* win, SDL_Texture* bac
 	//###END SHADER POC
 	
 	
+	void refreshCvsDispRect(int deltax,int deltay){
+		
+		// LOGD("x center %d y center %d \n",xcenter,ycenter);
+
+		//interfering with 2 fingers drag
+		
+	   // if( zoom<=dfltzoom ){
+		// zoom=dfltzoom;
+ 	   // cvsDispRect.w=CVSWDTH*zoom;
+		// cvsDispRect.h=CVSHGTH*zoom;
+	   // // cvsDispRect.x= xorig;
+	   // cvsDispRect.x=dfltxorig+deltax;
+	   // cvsDispRect.y=dfltyorig;
+	   // xorig=dfltxorig+deltax;
+	   // yorig=dfltyorig;
+	   // LOGD(" moving cvs disp rect x delta %d \n",deltax);
+		  // return;
+		   
+	   // }
+		
+	   cvsDispRect.w=CVSWDTH*zoom;
+		cvsDispRect.h=CVSHGTH*zoom;
+	   // cvsDispRect.x= xorig;
+	   // cvsDispRect.x=xcenter-(CVSWDTH*zoom/2);
+	   // cvsDispRect.y=ycenter-(CVSHGTH*zoom/2);
+		
+	   cvsDispRect.x=cvsDispRect.x+deltax/zoom;
+	   cvsDispRect.y=cvsDispRect.y+deltay/zoom;
+	   xorig=cvsDispRect.x;
+	   yorig=cvsDispRect.y;
+	}
 	
+	
+	//we want to keep center of the screen
+	void refreshCvsDispRectFromCenter(int cx,int cy){
+		
+	   cvsDispRect.w=CVSWDTH*zoom;
+		cvsDispRect.h=CVSHGTH*zoom;
+
+		//TODO calculate xorig based on new center
+		cvsDispRect.x=cx- (CVSWDTH*zoom)/2;
+		cvsDispRect.y=cy- (CVSHGTH*zoom)/2;
+		// cvsDispRect.x=cx;
+		// cvsDispRect.y=cy;
+
+		
+	   //TODO remove xorig yorig duplication
+	   xorig=cvsDispRect.x;
+	   yorig=cvsDispRect.y;
+	}
 	
 	
 		//curses project frames until a NULL is found
@@ -1234,7 +1325,7 @@ void saveFrame(char * path, int idx){
 		offset=BTN_BASE_W /4;
 		dispRect.w=offset;
 		dispRect.h=offset;
-		if(project[nb_edit_slot].timecode!=1){
+		// if(project[nb_edit_slot].timecode!=1){
 			for(i=0;i<project[nb_edit_slot].timecode;i++){
 				dispRect.x=BTN_BASE_W+i*offset;
 				dispRect.y=0;
@@ -1247,7 +1338,7 @@ void saveFrame(char * path, int idx){
 				);
 				
 			}
-		}
+		// }
 		
 		// decorate if in selection range
 		if(nb_edit_slot <=ce  && nb_edit_slot >= cb ){
@@ -1432,11 +1523,12 @@ void saveFrame(char * path, int idx){
 		//TODO interpolate events if applicable, and do all the blits in one render target change below
 		calculateTraj(interpolated,prevxc,prevyc,xc,yc);						
 		
-								paintCanvas
-								(interpolated,renderer,
-								toPaintTo,
-								activeBrush
-								);
+		paintCanvas
+		(
+			interpolated,renderer,
+			toPaintTo,
+			activeBrush
+		);
 	}
 
 
@@ -2473,7 +2565,7 @@ void init_play();
 		handleinput(&polled,
 		// true //has been blocking for most of the dev
 		false //for some reason on android, we don't get pen up event, so trying busy wait
-		);
+		,sw,sh);
 
 		//only test release at the mo
 		if(polled.pressed==false){
@@ -2791,7 +2883,7 @@ void init_play();
 	
 		handleinput(&polled,
 				true // blocking should be ok
-			);
+			,sw,sh);
 		if(polled.newpress){
 			LOGD("get pick TODO andro \n");
 			if( 
@@ -2958,7 +3050,7 @@ void init_play();
 	
 		handleinput(&polled,
 				//true //has been blocking for most of the dev
-				false
+				false,sw,sh
 			);
 
 		// LOGD("play anm\n");
@@ -3168,6 +3260,141 @@ void init_play();
 	
 	
 	
+
+	//*** ZOOM CENTER  MODE 
+	// void pastePosition();
+	
+	// SDL_Rect copy_clip_rect={0,0,0,0};
+	
+	// bool cc_ul=true; //we start by setting upper left clipping point
+	
+	// we display the copy source and click drag to sel a part of it
+	void zoom_center(){
+	
+		SDL_SetRenderTarget(renderer,NULL);
+		SDL_RenderClear(renderer);
+	   SDL_Rect dispRect ;
+		SDL_Rect clipRect; //for buttons sprite sheet
+	   
+	   dispRect.x=cvsDispRect.x
+	   ;
+	   dispRect.y=cvsDispRect.y
+	   ;
+	   dispRect.w=cvsDispRect.w;
+	   dispRect.h=cvsDispRect.h;
+		SDL_SetTextureAlphaMod(current,255);
+
+		SDL_RenderCopy(renderer,
+		current, 
+		NULL,
+		&dispRect
+		);
+
+		SDL_SetRenderDrawColor(renderer,
+		0,0,0,255);
+		dispRect.x=0;
+		dispRect.y=0;
+		dispRect.w=ZC_MAX_ZOOM;
+		dispRect.h=BTN_BASE_W;
+		SDL_RenderDrawRect(renderer,&dispRect);
+		
+
+		//blitting current zoom
+		dispRect.x=(int) ((float)zoom)/((float)ZOOM_MAX)*SCRWDTH;
+		LOGD("cursor x %d \n",dispRect.x);
+		dispRect.y=0;
+		dispRect.w=10;
+		dispRect.h=BTN_BASE_W;
+		SDL_RenderDrawRect(renderer,&dispRect);
+		
+		SDL_SetRenderDrawColor(renderer,255,255,255,255);
+
+		
+		//blitting an exit button
+		dispRect.x=CC_EXIT_UL_X;
+		dispRect.y=CC_EXIT_UL_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		clipRect.x=TOFF_VALIDATE_X;
+		clipRect.y=TOFF_VALIDATE_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		&dispRect
+		);
+		
+		
+		SDL_RenderPresent(renderer);
+
+		handleinput(&polled,
+		true // blocking 
+		// false
+		,sw,sh);
+
+		
+		//we get the click and scale before returning to paste position
+		if(polled.newpress){
+			//TODO add exit button
+			if(
+				polled.x < (CC_EXIT_UL_X+BTN_BASE_W)
+				&& polled.x > CC_EXIT_UL_X
+				&&	polled.y < (CC_EXIT_UL_Y+BTN_BASE_W)
+				&& polled.y > CC_EXIT_UL_Y
+			){
+				LOGD("exiting zoom center ");
+				// mode=pastePosition;
+				mode=edit;
+				return;
+			}else 
+			if( 
+				polled.y < (BTN_BASE_W)
+			){
+				//click on zoom bar
+				zoom=(float)polled.x/(float)CVSWDTH*(float)ZOOM_MAX;
+				LOGD("new zoom %f \n",zoom);
+				refreshCvsDispRectFromCenter(SCRWDTH/2,SCRHGTH/2);
+				
+				
+			}else
+			if(
+				(polled.x >= cvsDispRect.x)
+				&&
+				(polled.x <= cvsDispRect.x+cvsDispRect.w)
+				&&
+				(polled.y >= cvsDispRect.y)
+				&&
+				(polled.y <= cvsDispRect.y+cvsDispRect.h)
+			){
+				refreshCvsDispRectFromCenter(polled.x,polled.y);
+				
+			}
+				// if(polled.x <= cvsDispRect.x){
+					// polled.x=cvsDispRect.x;
+					// //we should be able to easily select things overlaping the left border 
+				// }
+
+				// //click is in canvas , we have boolean to alternate between the 2 coordinates points to set
+				// Uint16 xcvsCoord,ycvsCoord;
+				// Uint16 tx,ty;
+				// tx=polled.x - cvsDispRect.x;
+				// ty = polled.y - cvsDispRect.y;
+				// LOGD("tx ty before zoom scale %d %d \n" , tx,ty);
+				// xcvsCoord=tx/zoom;
+				// ycvsCoord=ty/zoom;
+				// LOGD("x y in canvas %d %d \n" , xcvsCoord,ycvsCoord);
+				
+			
+			// }
+
+		}
+	
+	}
+
 	
 	//*** COPY CLIP SELECTION MODE 
 	void pastePosition();
@@ -3260,7 +3487,7 @@ void init_play();
 		handleinput(&polled,
 		true // blocking 
 		// false
-		);
+		,sw,sh);
 
 		
 		//we get the click and scale before returning to paste position
@@ -3442,7 +3669,7 @@ void initTimeCodeMode(){
 		handleinput(&polled,
 		true // blocking 
 		// false
-		);
+		,sw,sh);
 
 
 
@@ -3544,7 +3771,7 @@ void initTimeCodeMode(){
 		handleinput(&polled,
 		true // blocking 
 		// false
-		);
+		,sw,sh);
 
 		//we get the click and scale before returning to paste position
 		if(polled.newpress){
@@ -3698,7 +3925,7 @@ void initTimeCodeMode(){
 		handleinput(&polled,
 		true // blocking 
 		// false
-		);
+		,sw,sh);
 
 
 		if(polled.newpress){
@@ -3842,8 +4069,51 @@ void initTimeCodeMode(){
 						//decouple event loop from polled, as events in dodonpachi mode 
 				//will be indirect
 						//classical you touch I paint
+
+				if(pol->multitouch){
+					LOGD("multitouch, cancel painting \n");
+					// MULTITOUCH_UNDO_THRESHOLD
+					Uint32 now=SDL_GetTicks();
+					Uint32 delta=now-last_paint_event;
+					LOGD(" last paint event bef multitouch %d \n",delta);
+					if( delta<MULTITOUCH_UNDO_THRESHOLD ){
+						unstackundo();
+						//TODO probably cap this so that we do not unstack to much
+					}					
+				}
+					
+				//if multidrag, change center
+				if(pol->multidrag){
+					LOGD("moving center");
+					int deltax,deltay;
+					deltax=pol->xcenter-pol->lastxcenter;
+					deltay=pol->ycenter-pol->lastycenter;
+					
+					LOGD("dx %d dy %d \n",deltax,deltay);
+					
+					if(deltax>20 or deltay>20 ){
+						LOGD("filtering excessive offset \n");
+						return;
+					}
+					
+					refreshCvsDispRect(deltax,deltay);
+					return;
+				}
 				
-				
+				if(pol->pinch){
+					LOGD("zoom before %f \n",zoom);
+					LOGD("p amount %f \n",pol->pamount);
+					zoom=zoom+pol->pamount*10;
+					LOGD("zoom after %f \n",zoom);
+					refreshCvsDispRect(0,0);
+					return;
+				}
+						
+				//if no multidrag but multitouch we do not paint
+				if(pol->multitouch){
+					return;
+				}
+						
 
 				//WIP weakness we need to persist painting state from new press to end press
 				// right now after new press consumed in other states, paints a bit on coming back
@@ -3870,7 +4140,7 @@ void initTimeCodeMode(){
 								// if not in canvas coordinate,
 								//do not set dirty flag
 								xc=(pol->x-xorig)/zoom;
-								yc=(pol->y-YORIG)/zoom;
+								yc=(pol->y-yorig)/zoom;
 							
 								incanvas=false; //default
 								if( (xc>=0 && xc<=CVSWDTH)
@@ -3894,7 +4164,7 @@ void initTimeCodeMode(){
 									}
 									
 									
-									
+									last_paint_event=SDL_GetTicks();
 									paintHandlingUI(
 										prevxc,
 										prevyc,
@@ -4001,7 +4271,7 @@ void initTimeCodeMode(){
 								// if not in canvas coordinate,
 								//do not set dirty flag
 								xc=(xcursor-xorig)/zoom;
-								yc=(ycursor-YORIG)/zoom;
+								yc=(ycursor-yorig)/zoom;
 							
 								incanvas=false; //default
 								if( (xc>=0 && xc<=CVSWDTH)
@@ -4073,7 +4343,7 @@ void initTimeCodeMode(){
 	  }
 	
 	
-Uint16 copy_frame_nb=-1;
+Sint16 copy_frame_nb=-1;
 	
 	
 void toNextFrame(){
@@ -4362,7 +4632,7 @@ bool checkButtonColl(int x,int y){
 				handleinput(&polled,
 				true //has been blocking for most of the dev
 				//false
-				);
+				,sw,sh);
 				
 				// kshortcuts(&polled);
 				
@@ -4405,7 +4675,8 @@ bool checkButtonColl(int x,int y){
 		
 		
 		SDL_RenderPresent(renderer);
-
+		// LOGD("render gpu poc\n");
+		
 		//debug for note 3 neo flicker
 		//LOGD("zzn render gpu poc\n");
 
@@ -4707,12 +4978,31 @@ bool checkButtonColl(int x,int y){
 		// NULL,
 		&dispRect
 		);
+
+		//zoom mode
+		clipRect.x=TOFF_ZOOMMODE_X;
+		clipRect.y=TOFF_ZOOMMODE_Y;
+		clipRect.w=64;
+		clipRect.h=64;
+		
+		dispRect.x=BTN_ZOOMMODE_X;
+		dispRect.y=BTN_ZOOMMODE_Y;
+		dispRect.w=BTN_BASE_W;
+		dispRect.h=BTN_BASE_W;
+
+		SDL_RenderCopy(renderer,
+		buttons, 
+		&clipRect,
+		// NULL,
+		&dispRect
+		);
+
 		//render current brush
 		
-		dispRect.x=BTN_BASE_W;
-		dispRect.y=SCRHGTH-(Uint16)brushScale*zoom;
-		dispRect.w=(Uint16)brushScale*zoom;
-		dispRect.h=(Uint16)brushScale*zoom;
+		dispRect.x=(int)(BTN_BASE_W);
+		dispRect.y=(int)(SCRHGTH-(Uint16)brushScale*zoom);
+		dispRect.w=(int)(brushScale*zoom);
+		dispRect.h=(int)(brushScale*zoom);
 
 						   
 
@@ -4809,7 +5099,7 @@ bool checkButtonColl(int x,int y){
 		handleinput(&polled,
 				true // blocking should be ok
 				//false
-			);
+			,sw,sh);
 
 
 		//handle settings click
@@ -4828,8 +5118,9 @@ bool checkButtonColl(int x,int y){
 				LOGD("y click as float %f \n",t1);
 				float t2=SLDR_BRSH_HGHT;
 				LOGD("sldr hght as float %f \n",t2);
-				Uint16 radius=
-				(t1/t2)*64 ; //64 is max brush scale , 128 to 256 fails on win???
+				float fradius=(t1/t2)*64.0;
+				LOGD(" fradius %f \n",fradius);
+				Uint16 radius=	(Uint16)( fradius ) ; //64 is max brush scale , 128 to 256 fails on win???
 				// ((float)polled.y/(float)SLDR_BRSH_HGHT);
 				LOGD("new brushscale %d \n",radius);
 				if ( radius==0){
@@ -5030,6 +5321,15 @@ bool checkButtonColl(int x,int y){
 				&& polled.y > BTN_PP_UL_Y
 			){
 				mode=pastePosition;
+				return;
+			}else
+			if( 
+				polled.x < (BTN_ZOOMMODE_X+BTN_BASE_W)
+				&& polled.x > BTN_ZOOMMODE_X
+				&&	polled.y < (BTN_ZOOMMODE_Y+BTN_BASE_W)
+				&& polled.y > BTN_ZOOMMODE_Y
+			){
+				mode=zoom_center;
 				return;
 			}else
 			if( 
@@ -5362,13 +5662,13 @@ void saveTranspCol(){
 		#ifndef __ANDROID_API__
 		reqscrw=
 		// SCRWDTH
-		//852
-		1300
+		852
+		// 1300
 		;
 		reqscrh=
-		700
+		// 700
 		// SCRHGTH
-		//480
+		480
 		;
 		SDL_SetHint(SDL_HINT_RENDER_DRIVER,"opengl");
 		
@@ -5388,21 +5688,36 @@ void saveTranspCol(){
 		SDL_GetWindowSize(window, &sw, &sh);
 		LOGD("zzn real height and w %d %d \n",sh,sw);
 		//canvas zoom
-		zoom=((float) SCRHGTH) / ((float)CVSHGTH);
+		dfltzoom=((float) SCRHGTH) / ((float)CVSHGTH);
+		zoom=dfltzoom;
+		// zoom=4;
+		
 		//button zoom
 		//720p should give 2
 		buttonZoom=((float)sh)/((float)360);
 		LOGD("zzn button zoom %f \n",buttonZoom);
 	
-		xorig=sw/2 - CVSWDTH*zoom /2;
-
+		dfltxorig=sw/2 - (int) (CVSWDTH*zoom /2);
+		dfltyorig=YORIG;
 	
 		//TODO update origin to center display
+		//TODO recalculate cvsDispRect when zoom updated
+		// refreshCvsDispRect(sw/2,sh/2);
+		
 	   cvsDispRect.w=CVSWDTH*zoom;
 		cvsDispRect.h=CVSHGTH*zoom;
-	   cvsDispRect.x= xorig;
-	   // XORIG;
-	   cvsDispRect.y=YORIG;
+	   cvsDispRect.x=dfltxorig;
+	   cvsDispRect.y=dfltyorig;
+	   xorig=cvsDispRect.x;
+	   yorig=cvsDispRect.y;
+		
+		
+		
+	   // cvsDispRect.w=CVSWDTH*zoom;
+		// cvsDispRect.h=CVSHGTH*zoom;
+	   // cvsDispRect.x= xorig;
+	   // // XORIG;
+	   // cvsDispRect.y=YORIG;
 		
 //########### BEGIN SOUND TEST
 	//debug :)
@@ -5490,8 +5805,8 @@ void saveTranspCol(){
 		
 		polled.quit=false;//toget in the while
 		polled.pressed=false;//init 
-		polled.sh=sh;
-		polled.sw=sw;
+		// polled.sh=sh;
+		// polled.sw=sw;
 		
 		prevxc=-1;prevyc=-1;
 		initedit();

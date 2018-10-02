@@ -804,7 +804,7 @@ bool checkButtonColl(int x,int y){
 		// done
 		)
 		{
-			handleinput(&polled,true);
+			handleinput(&polled,true,sw,sh);
 			/* Wait for events */
 			// SDL_WaitEvent(&event);
 			// do {
